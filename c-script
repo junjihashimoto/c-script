@@ -1,0 +1,358 @@
+#!/usr/bin/env perl
+use File::Basename;
+use Cwd qw(realpath getcwd);
+use Digest::MD5 qw(md5_hex);
+use Getopt::Long;
+use Data::Dumper;
+use strict;
+
+our $script_home;
+our $script_name;
+our $debug;
+our $home;
+our $main_src;
+our $run_dir;
+
+our $cc;
+our $debug_opt;
+our $exe;
+our $inc;
+our $libs;
+our $mod_main_src;
+our $normal_opt;
+our $opt;
+our $other_src;
+our $code;
+
+our $linux;
+our $win;
+our $init_script;
+our $output_opt;
+our @dirs;
+our $show_code;
+our $show_cmd;
+our $clean;
+
+our $default_header;
+
+#local @dirs;
+
+$init_script="init.pl";
+
+$linux = $^O eq "linux" ? 1 : 0;
+$win   = $^O eq "MSWin32" ? 1 : 0;
+
+sub show_usage{
+print << "END_OF_USAGE";
+Usage: c-script [options] script-file [script-options]
+ -d      runs the program under the gdb.
+ -gdb    runs the program under the gdb.
+ -ddd    runs the program under the ddd.
+ -vc     runs the program under the visual studio
+ -show   outputs code after preprocess
+ -cmd    outputs compiler-options
+ -clean  removes cache of both exe and source
+END_OF_USAGE
+}
+
+sub get_cmd_options{
+    while(1){
+	my $op=$ARGV[0];
+	if($#ARGV==-1){
+	    show_usage;
+	    exit;
+	}elsif ( $op eq "-d"){
+	    $debug="gdb";
+	    shift @ARGV;
+	    #next;
+	    last;
+	}elsif ( $op eq "-gdb"){
+	    $debug="gdb";
+	    shift @ARGV;
+	    last;
+	}elsif ( $op eq "-ddd"){
+	    $debug="ddd";
+	    shift @ARGV;
+	    last;
+	}elsif ( $op eq "-vc"){
+	    $debug="vc";
+	    shift @ARGV;
+	    last;
+	}elsif ( $op eq "-show"){
+	    $show_code=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-cmd"){
+	    $show_cmd=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-clean"){
+	    $clean=1;
+	    shift @ARGV;
+	    next;
+	}elsif (-e $op ){
+	    last;
+	}else{
+	    show_usage;
+	    exit;
+	}
+    }
+}
+
+sub setup{
+    $script_home=realpath(dirname  $0);
+    $script_name=basename $0;
+
+
+    if($debug){
+	for(@ARGV){
+	    if( -f $_){
+		$main_src=$_;
+		last;
+	    }
+	}
+    }else{
+	$main_src=realpath(shift @ARGV);
+    }
+
+    $main_src=~s/\\/\//g if($win); 
+
+
+    $run_dir=dirname $main_src;
+    if($win){
+	$home=$script_home."/.c-script";
+    }else{
+	$home=$ENV{HOME}."/.c-script";
+    }
+
+    if($clean){
+	my $h=$home."/cache";
+	for(glob $h."/*"){
+	    unlink $_;
+	}
+    }
+#    for(glob $script_home."/*.h"){
+#	$inc.=" ".realpath($1);
+#	print $1;
+#    }
+#    print $inc;
+#    exit;
+
+}
+
+sub getlib{
+    my $path=shift;
+    my @g=glob($path);
+    my $g=$g[0];
+    if(! -f $g){
+	return "";
+    }else{
+	$g=basename $g;
+	$g=~ s/^lib//g;
+	$g=~ s/\.so$//g;
+	$g=~ s/\.a$//g;
+	return "-l".$g."\n";
+    }
+}
+
+sub load_init_pl{
+    my $file=shift;    
+    my ($suffix)=($file =~ /\.([^.]*$)/);
+    
+    if(-e "$home/init/$init_script"){
+	do "$home/init/$init_script";
+    }else{
+	do "$script_home/init/$init_script";
+    }
+
+    if(-e "$home/init/suffix_${suffix}.pl"){
+    	do "$home/init/suffix_${suffix}.pl";
+    }elsif(-e "$script_home/init/suffix_${suffix}.pl"){
+    	do "$script_home/init/suffix_${suffix}.pl";
+    }
+
+    $normal_opt =~ s/\n/ /g;
+    $debug_opt =~ s/\n/ /g;
+    $opt =~ s/\n/ /g;
+    $libs =~ s/\n/ /g;
+    
+    if($debug){
+	$opt=$debug_opt.' '.$opt;
+    }else{
+	$opt=$normal_opt.' '.$opt;
+    }
+}
+
+sub modtime{
+    my $filepath=shift;
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,
+	$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($filepath);
+    return $mtime;
+}
+
+
+sub gen_exe{
+    my ($main_src,$inc,$other_src)=@_;
+    my ($s)=split ' ', md5_hex("$main_src$inc$other_src");
+    my ($suffix)=($main_src =~ /(\.[^.]*$)/);
+    my $h=$home."/cache";
+    if(!$suffix){
+	$suffix=".cpp";
+    }
+    if( ! -d $home){
+	mkdir "$home";
+    }
+    if( ! -d $h){
+	mkdir "$h";
+    }
+    
+    return ($h.'/'.$s.$debug.".exe",$suffix);
+}
+
+sub gen_exename{
+    my ($exe,$suffix)=gen_exe $main_src,$inc,$other_src;
+    
+    if($debug){
+	for(@ARGV){
+	    if( -f $_){
+		$_=$exe;
+		last;
+	    }
+	}
+    }
+
+    return ($exe.$suffix,$exe);
+}
+
+sub gen_src{
+    my ($main_src,$mod_main_src)=@_;
+    my $line;
+    open IN,"<$main_src";
+    open OUT,">$mod_main_src";
+    $code="";
+    $code.=$default_header;
+    $code.="#line 1  \"$main_src\"\n";
+    while(<IN>){
+	if(/^#!.*/){
+	    $code.="\n";
+	}elsif(/^#pragma\s+c-script.*$/){
+	    $code.="\n";
+	}else{
+	    $code.=$_;
+	}
+    }
+    print OUT $code;
+    close OUT;
+    if($show_code){
+	print $code;
+	exit;
+    }
+}
+
+sub getparam{
+    my $file=shift;
+    local *IN;
+    
+    open IN,"<$file";
+    while(<IN>){
+	if(/^#pragma\s+c-script:src\s+(.*)/){
+	    $other_src.=" ".realpath($1);
+	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){
+	    $opt.=" ".$1;
+	}elsif(/^#pragma\s+c-script:eval\s+(.*)/){
+	    eval $1;
+	}elsif(/^#pragma\s+c-script:do\s+(.*)/){
+	    do $1;
+	}elsif(/^#pragma\s+c-script:cc\s+(.*)/){
+	    $cc=$1;
+	}elsif(/^#pragma\s+c-script:libs\s+(.*)/){
+	    $libs.=" ".$1;
+	}elsif(/^#pragma\s+c-script:no_default_header/){
+	    $default_header="\n";
+	}elsif(/^#include\s+"([^"]+)/){
+	    $inc.=" ".realpath($1);
+	}
+    }
+    close IN;
+}
+
+
+sub pushd{
+    push @dirs,getcwd();
+    chdir $_[0];
+}
+sub popd{
+    chdir (pop @dirs);
+}
+sub chmodx{
+    open(my $fh, "<", $_[0]);
+    my $perm = (stat $fh)[2] & 07777;
+    chmod($perm | 0100, $fh);
+    close $fh;
+}
+sub compile{
+    pushd $run_dir;
+    my $cmd="$cc $opt $output_opt$exe $mod_main_src $other_src $libs";
+    if($show_cmd){
+	print $cmd,"\n";
+    }
+    `$cmd`;
+    my $exit_value = $? >> 8;
+    popd
+    exit if($exit_value!=0);
+    chmodx $exe if(!$win);
+}
+
+
+sub run{
+    if($debug eq "gdb"){
+	exec 'gdb',@ARGV;
+    }elsif($debug  eq "ddd"){
+	exec 'ddd',@ARGV;
+    }elsif($debug eq "vc"){
+	$exe=~s/\//\\/g;
+	print 'vcexpress','/debugexe',$exe,@ARGV;
+	exec 'vcexpress','/debugexe',"${exe}.exe",@ARGV;
+    }else{
+	exec $exe,@ARGV;
+    }
+}
+
+sub compilep{
+    my ($exe,$main_src,$other_src,$inc)=@_;
+    my $c=0;
+    if(! -e $exe){
+	$c=1;
+    }else{
+	my @files;
+	my $t=modtime( $exe);
+	push @files,$main_src;
+	push @files,(split ' ',$other_src);
+	push @files,(split ' ',$inc);
+	
+	for(@files){
+	    if($t < modtime($_)){
+		$c=1;
+		last;
+	    }
+	}
+    }
+    return $c;
+}
+
+get_cmd_options();
+
+setup();
+
+load_init_pl($main_src);
+
+getparam($main_src);
+
+($mod_main_src,$exe)=gen_exename();
+
+gen_src($main_src,$mod_main_src);
+
+compile() if compilep($exe,$main_src,$other_src,$inc);
+
+run();
+
