@@ -37,6 +37,9 @@ $opt=qq(
 );
 
 $libs=qq(
+-ljpeg
+-lpng
+-lz
 -lm
 );
 
