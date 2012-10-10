@@ -3,10 +3,12 @@
   CUDA_SAFE_CALL( cudaMalloc( (void**) &ptr, sizeof(ptr[0])*(size)));
 #define free_d(ptr) \
   CUDA_SAFE_CALL( cudaFree  ( ptr))
-#define mv_h2d(from,to,size) \
-  CUDA_SAFE_CALL( cudaMemcpy( (to), (from),  sizeof(from[0])*(size), cudaMemcpyHostToDevice) ) 
-#define mv_d2h(from,to,size) \
-  CUDA_SAFE_CALL( cudaMemcpy( (to), (from),  sizeof(from[0])*(size), cudaMemcpyDeviceToHost) )
+#define cpy_h2d(from,to,size) \
+  CUDA_SAFE_CALL( cudaMemcpy( (to), (from),  (size), cudaMemcpyHostToDevice) ) 
+#define cpy_d2h(from,to,size) \
+  CUDA_SAFE_CALL( cudaMemcpy( (to), (from),  (size), cudaMemcpyDeviceToHost) )
+#define cpy_d2d(from,to,size) \
+  CUDA_SAFE_CALL( cudaMemcpy( (to), (from),  (size), cudaMemcpyDeviceToDevice) )
 #define call_h2d(grid,threads,func,...) {    \
   func<<< grid,threads>>>(__VA_ARGS__);  \
   CUDA_SAFE_CALL( cudaThreadSynchronize() ); \
@@ -66,12 +68,12 @@ struct Mem : MemRoot{
   }
   void h2d(){
     if(rflag)
-      mv_h2d(h,d,s);
+      cpy_h2d(h,d,s*sizeof(T));
   }
   
   void d2h(){
     if(wflag)
-      mv_d2h(d,h,s);
+      cpy_d2h(d,h,s*sizeof(T));
   }
   T& operator [](int x){
     return h[x];
