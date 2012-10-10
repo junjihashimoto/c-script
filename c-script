@@ -24,6 +24,9 @@ our $opt;
 our $other_src;
 our $code;
 
+our $gdb;
+our $ddd;
+
 our $linux;
 our $win;
 our $init_script;

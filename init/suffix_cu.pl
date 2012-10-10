@@ -1,4 +1,5 @@
 $cc="nvcc";
+$gdb="cuda-gdb";
 $opt.=" -I/usr/local/cuda/sdk/C/common/inc";
 #$opt.=" --compiler-options -fno-inline -Xcompiler -D__builtin_stdarg_start=__builtin_va_start";
 #$opt.=" --compiler-bindir /usr/local/cuda/gcc.bin";

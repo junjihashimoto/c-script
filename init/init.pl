@@ -1,4 +1,6 @@
 $cc="g++";
+$gdb="gdb";
+$ddd="ddd";
 
 $default_header="#include <c-script.h>\n";
 
