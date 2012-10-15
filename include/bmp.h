@@ -267,8 +267,10 @@ Bitmap<T>::check(const char* file){
 	  buf[2]=='N' &&
 	  buf[3]=='G')
     return 1;
-  else if(strstr(fname.c_str(),".jpg")!=NULL ||
-	  strstr(fname.c_str(),".jpeg")!=NULL)
+  else if(buf[0]==0xff &&
+	  buf[1]==0xd8 &&
+	  buf[2]==0xff &&
+	  buf[3]==0xe0 )
     return 1;
   else
     return 0;
@@ -292,8 +294,10 @@ Bitmap<T>::read(const char* file,int w,int h){
 	  buf[2]=='N' &&
 	  buf[3]=='G')
     readPng(fname.c_str());
-  else if(strstr(fname.c_str(),".jpg")!=NULL ||
-	  strstr(fname.c_str(),".jpeg")!=NULL)
+  else if(buf[0]==0xff &&
+	  buf[1]==0xd8 &&
+	  buf[2]==0xff &&
+	  buf[3]==0xe0 )
     readJpeg(fname.c_str());
   return;
 }
