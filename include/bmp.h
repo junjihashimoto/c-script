@@ -294,11 +294,12 @@ Bitmap<T>::read(const char* file,int w,int h){
 	  buf[2]=='N' &&
 	  buf[3]=='G')
     readPng(fname.c_str());
-  else if(buf[0]==0xff &&
-	  buf[1]==0xd8 &&
-	  buf[2]==0xff &&
-	  buf[3]==0xe0 )
+  else if(buf[0]==(char)0xff &&
+	  buf[1]==(char)0xd8 &&
+	  buf[2]==(char)0xff &&
+	  buf[3]==(char)0xe0 )
     readJpeg(fname.c_str());
+  
   return;
 }
 
@@ -479,11 +480,11 @@ Bitmap<T>::readJpeg(const char* file){
   int width;
   int height;
 
-
   cinfo.err = jpeg_std_error( &jerr );
   jpeg_create_decompress( &cinfo );
 
   FILE* infile = fopen(file, "rb" );
+
   jpeg_stdio_src( &cinfo, infile );
 
   jpeg_read_header( &cinfo, TRUE );

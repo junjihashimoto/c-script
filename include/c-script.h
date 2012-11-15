@@ -13,3 +13,4 @@ using namespace std;
 #include <c-script-util.h>
 #include <bmp.h>
 #include <plot.h>
+#include <matrix/mat.h>

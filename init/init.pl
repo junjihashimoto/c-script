@@ -35,10 +35,19 @@ $normal_opt=qq(
 $debug_opt ="-g";
 
 $opt=qq(
--I$script_home -I$script_home/include -L$script_home  -I. -L.
+-I$script_home
+-I$script_home/include
+-I$script_home/include/matrix
+-L$script_home
+-I.
+-L.
 );
 
 $libs=qq(
+-llapack
+-latlas
+-lblas
+-lgfortran
 -ljpeg
 -lpng
 -lz
