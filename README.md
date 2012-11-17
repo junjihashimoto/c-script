@@ -52,45 +52,52 @@ Type
 
 Command line options
 --------------------
->Usage: c-script [options] script-file [script-options]
-> -nomain  insert main-function automatically
-> -nocache compile the program everytime
-> -d       run the program under the gdb
-> -gdb     run the program under the gdb
-> -ddd     run the program under the ddd
-> -vc      run the program under the visual studio
-> -show    output code after preprocess
-> -cmd     output compiler-options
-> -clean   remove cache of both exe and source
->
+~~~~~~
+Usage: c-script [options] script-file [script-options]
+ -nomain  insert main-function automatically
+ -nocache compile the program everytime
+ -d       run the program under the gdb
+ -gdb     run the program under the gdb
+ -ddd     run the program under the ddd
+ -vc      run the program under the visual studio
+ -show    output code after preprocess
+ -cmd     output compiler-options
+ -clean   remove cache of both exe and source
+~~~~~~
+
 
 Pragmas
 -------
->#pragma c-script:src  "file1" "file2" ..
-> compile with "file1" "file2" ..
->#pragma c-script:opt  "additional compile options"
-> add compile options 
->#pragma c-script:eval "Run perl-expression"
-> 
->#pragma c-script:do   "Run perl-script"
->#pragma c-script:cc   "compiler command name(default:g++)"
->#pragma c-script:libs "liked library options"
->#pragma c-script:no_default_header
->
+~~~~~~
+#pragma c-script:src  "file1" "file2" ..
+ compile with "file1" "file2" ..
+#pragma c-script:opt  "additional compile options"
+ add compile options 
+#pragma c-script:eval "Run perl-expression"
+ 
+#pragma c-script:do   "Run perl-script"
+#pragma c-script:cc   "compiler command name(default:g++)"
+#pragma c-script:libs "liked library options"
+#pragma c-script:no_default_header
+~~~~~~
+
 
 Files for this system
 ---------------------
->init/init.pl
->init/suffix_cu.pl
->init/suffix_cs.pl
->init/suffix_m.pl
->$HOME/init.pl
->$HOME/.c-script/cache
->
+~~~~~~
+init/init.pl
+init/suffix_cu.pl
+init/suffix_cs.pl
+init/suffix_m.pl
+$HOME/init.pl
+$HOME/.c-script/cache
+~~~~~~
+
 
 
 Compilation and execution flow
 ------------------------------
+
 This runs following steps.
 1. Read initialization script for reading compilation paramater.
 2. Generate compiled code (For example, header like '#include' is added.)
