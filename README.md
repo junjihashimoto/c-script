@@ -33,12 +33,14 @@ Case1:
 Case2:  
 1.Write script  
 For example,
->#!/usr/bin/env c-script
->int
->main(){
->  printf("hello world\n");
->  return 0;
->}
+~~~~~~
+#!/usr/bin/env c-script
+int
+main(){
+  printf("hello world\n");
+  return 0;
+}
+~~~~~~
 
 2.Chmod
 Type
@@ -61,6 +63,7 @@ Command line options
 > -cmd     output compiler-options
 > -clean   remove cache of both exe and source
 >
+
 Pragmas
 -------
 >#pragma c-script:src  "file1" "file2" ..
