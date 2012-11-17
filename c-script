@@ -23,6 +23,8 @@ our $normal_opt;
 our $opt;
 our $other_src;
 our $code;
+our $no_main;
+our $no_cache;
 
 our $gdb;
 our $ddd;
@@ -48,13 +50,15 @@ $win   = $^O eq "MSWin32" ? 1 : 0;
 sub show_usage{
 print << "END_OF_USAGE";
 Usage: c-script [options] script-file [script-options]
- -d      runs the program under the gdb.
- -gdb    runs the program under the gdb.
- -ddd    runs the program under the ddd.
- -vc     runs the program under the visual studio
- -show   outputs code after preprocess
- -cmd    outputs compiler-options
- -clean  removes cache of both exe and source
+ -nomain  insert main-function automatically
+ -nocache compile the program everytime
+ -d       run the program under the gdb
+ -gdb     run the program under the gdb
+ -ddd     run the program under the ddd
+ -vc      run the program under the visual studio
+ -show    output code after preprocess
+ -cmd     output compiler-options
+ -clean   remove cache of both exe and source
 END_OF_USAGE
 }
 
@@ -64,6 +68,14 @@ sub get_cmd_options{
 	if($#ARGV==-1){
 	    show_usage;
 	    exit;
+	}elsif ( $op eq "-nomain"){
+	    $no_main=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-nocache"){
+	    $no_cache=1;
+	    shift @ARGV;
+	    next;
 	}elsif ( $op eq "-d"){
 	    $debug="gdb";
 	    shift @ARGV;
@@ -229,21 +241,30 @@ sub gen_exename{
 
 sub gen_src{
     my ($main_src,$mod_main_src)=@_;
-    my $line;
+    my $line=1;
     open IN,"<$main_src";
     open OUT,">$mod_main_src";
     $code="";
     $code.=$default_header;
-    $code.="#line 1  \"$main_src\"\n";
+    
+    $code.="int main(int argc,char** argv){\n" if($no_main);
+    
+    $code.="#line $line  \"$main_src\"\n";
     while(<IN>){
+	$line++;
+	
 	if(/^#!.*/){
 	    $code.="\n";
 	}elsif(/^#pragma\s+c-script.*$/){
 	    $code.="\n";
+	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
+	    $code.="$1".`$2`."$3\n";
 	}else{
 	    $code.=$_;
 	}
+	
     }
+    $code.="  return 0;\n}\n" if($no_main);
     print OUT $code;
     close OUT;
     if($show_code){
@@ -270,6 +291,8 @@ sub getparam{
 	    $cc=$1;
 	}elsif(/^#pragma\s+c-script:libs\s+(.*)/){
 	    $libs.=" ".$1;
+	}elsif(/^#pragma\s+c-script:no_cache/){
+	    $no_cache=1;
 	}elsif(/^#pragma\s+c-script:no_default_header/){
 	    $default_header="\n";
 	}elsif(/^#include\s+"([^"]+)/){
@@ -355,7 +378,7 @@ getparam($main_src);
 
 gen_src($main_src,$mod_main_src);
 
-compile() if compilep($exe,$main_src,$other_src,$inc);
+compile() if !$no_cache && compilep($exe,$main_src,$other_src,$inc);
 
 run();
 
