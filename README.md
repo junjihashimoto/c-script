@@ -34,12 +34,14 @@ Case2:
 1.Write script
 For example,
 --my_cpp_program.cpp begin---
+`
 #!/usr/bin/env c-script
 int
 main(){
 printf("hello world\n");
 return 0;
 }
+`
 --my_cpp_program.cpp end---
 
 2.Chmod
