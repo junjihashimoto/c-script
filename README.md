@@ -32,6 +32,7 @@ Case1:
 
 Case2:  
 1.Write script  
+
 For example,
 ~~~~~~
 #!/usr/bin/env c-script
@@ -43,11 +44,11 @@ main(){
 ~~~~~~
 
 2.Chmod
-Type
+
 >chmod +x above_cpp_program.cpp
 
 3.Run
-Type
+
 >./above_cpp_program.cpp
 
 Command line options
@@ -99,6 +100,7 @@ Compilation and execution flow
 ------------------------------
 
 This runs following steps.
+
 1. Read initialization script for reading compilation paramater.
 2. Generate compiled code (For example, header like '#include' is added.)
 3. Compile 
