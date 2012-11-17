@@ -3,22 +3,22 @@ c-script
 
 c-script provides the function of script language for c++.
 
-This is made for throwaway, short, and fast programs.
+This is made for throwaway, short, and fast programs.  
 This gives weight to runtime speed for solving image processing problems.
 
-You needs only script to run your program.
+You needs only script to run your program.  
 Makefile and some build tool are not needed.
 
 This supports following functions.
 
-1.Shebang
-2.Cache    : When compiled once, executable cache is used the next time.
-3.Debugger(gdb,ddd,emacs,VC++) and reasonable compile error message.
-4.#pragma  : Compilation option is controlled by #pragma.
-5.Image manipulation : This can read and write bmp, jpg and png.
-6.Matrix function like eigen: This uses blas and lapack.
-7.Drawing graph funtion by gnuplot
-8.c++, cuda, c, obj-c and c# are supported.
+1. Shebang
+2. Cache    : When compiled once, executable cache is used the next time.
+3. Debugger(gdb,ddd,emacs,VC++) and reasonable compile error message.
+4. #pragma  : Compilation option is controlled by #pragma.
+5. Image manipulation : This can read and write bmp, jpg and png.
+6. Matrix function like eigen: This uses blas and lapack.
+7. Drawing graph funtion by gnuplot
+8. c++, cuda, c, obj-c and c# are supported.
 
 Install
 -------
