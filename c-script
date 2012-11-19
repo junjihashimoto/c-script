@@ -22,8 +22,7 @@ our $mod_main_src;
 our $normal_opt;
 our $opt;
 our $other_src;
-our $code;
-our $no_main;
+our $no_chk_main;
 our $no_cache;
 
 our $gdb;
@@ -50,15 +49,15 @@ $win   = $^O eq "MSWin32" ? 1 : 0;
 sub show_usage{
 print << "END_OF_USAGE";
 Usage: c-script [options] script-file [script-options]
- -nomain  insert main-function automatically
- -nocache compile the program everytime
- -d       run the program under the gdb
- -gdb     run the program under the gdb
- -ddd     run the program under the ddd
- -vc      run the program under the visual studio
- -show    output code after preprocess
- -cmd     output compiler-options
- -clean   remove cache of both exe and source
+ -no_chk_main  disable of main-function-insertion
+ -nocache      compile the program everytime
+ -d            run the program under the gdb
+ -gdb          run the program under the gdb
+ -ddd          run the program under the ddd
+ -vc           run the program under the visual studio
+ -show         output code after preprocess
+ -cmd          output compiler-options
+ -clean        remove cache of both exe and source
 END_OF_USAGE
 }
 
@@ -68,8 +67,8 @@ sub get_cmd_options{
 	if($#ARGV==-1){
 	    show_usage;
 	    exit;
-	}elsif ( $op eq "-nomain"){
-	    $no_main=1;
+	}elsif ( $op eq "-no_chk_main"){
+	    $no_chk_main=1;
 	    shift @ARGV;
 	    next;
 	}elsif ( $op eq "-nocache"){
@@ -242,12 +241,32 @@ sub gen_exename{
 sub gen_src{
     my ($main_src,$mod_main_src)=@_;
     my $line=1;
+    my $code="";
+    my $inline_code="";
+    my $head;
+    my $tail;
+    my $nomain=1;
+
+    my ($suffix)=($script_name =~ /\.([^.]*$)/);
+
+    if(!$no_chk_main){
+	open IN_MAIN,"<$main_src";
+	while(<IN_MAIN>){
+	    if(/main|Main/){
+		$nomain=0;
+		last;
+	    }
+	}
+	close IN_MAIN;
+    }
+    
+
     open IN,"<$main_src";
     open OUT,">$mod_main_src";
-    $code="";
+    
     $code.=$default_header;
     
-    $code.="int main(int argc,char** argv){\n" if($no_main);
+    $code.="int main(int argc,char** argv){\n" if($nomain);
     
     $code.="#line $line  \"$main_src\"\n";
     while(<IN>){
@@ -258,13 +277,33 @@ sub gen_src{
 	}elsif(/^#pragma\s+c-script.*$/){
 	    $code.="\n";
 	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
-	    $code.="$1".`$2`."$3\n";
+	    $inline_code=`$2`;
+	    chomp $inline_code;
+	    $code.="$1".$inline_code."$3\n";
+	    $code.="#line $line  \"$main_src\"\n";
+	    
+	}elsif(/^(.*)\[\[(.*)$/){
+	    $head=$1;
+	    $inline_code=$2;
+	    while(<IN>){
+		$line++;
+		if(/^(.*)\]\](.*)$/){
+		    $inline_code.=$1;
+		    $tail=$2;
+		    last;
+		}
+	    }
+	    $inline_code=`$inline_code`;
+	    chomp $inline_code;
+	    $code.=$head.$inline_code.$tail."\n";
+	    $code.="#line $line  \"$main_src\"\n";
+	    
 	}else{
 	    $code.=$_;
 	}
 	
     }
-    $code.="  return 0;\n}\n" if($no_main);
+    $code.="  return 0;\n}\n" if($nomain);
     print OUT $code;
     close OUT;
     if($show_code){
@@ -376,9 +415,10 @@ getparam($main_src);
 
 ($mod_main_src,$exe)=gen_exename();
 
-gen_src($main_src,$mod_main_src);
-
-compile() if !$no_cache && compilep($exe,$main_src,$other_src,$inc);
+if(!$no_cache && compilep($exe,$main_src,$other_src,$inc)){
+    gen_src($main_src,$mod_main_src);
+    compile();
+}
 
 run();
 

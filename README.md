@@ -55,15 +55,15 @@ Command line options
 --------------------
 ~~~~~~
 Usage: c-script [options] script-file [script-options]
- -nomain  insert main-function automatically
- -nocache compile the program everytime
- -d       run the program under the gdb
- -gdb     run the program under the gdb
- -ddd     run the program under the ddd
- -vc      run the program under the visual studio
- -show    output code after preprocess
- -cmd     output compiler-options
- -clean   remove cache of both exe and source
+ -no_chk_main  disable of main-function-insertion
+ -nocache      compile the program everytime
+ -d            run the program under the gdb
+ -gdb          run the program under the gdb
+ -ddd          run the program under the ddd
+ -vc           run the program under the visual studio
+ -show         output code after preprocess
+ -cmd          output compiler-options
+ -clean        remove cache of both exe and source
 ~~~~~~
 
 

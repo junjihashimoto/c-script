@@ -1,4 +1,4 @@
-#!/home/junji/c-script/c-script -nomain
+#!/usr/bin/env c-script
 
 struct test{
   static void myfunc(){
