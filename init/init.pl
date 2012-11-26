@@ -43,6 +43,11 @@ $opt=qq(
 -L.
 );
 
+if($static){
+    $opt.=' -static ';
+}
+
+
 $libs=qq(
 -llapack
 -latlas
@@ -54,13 +59,6 @@ $libs=qq(
 -lm
 );
 
-%autolibs=(
-    math.h => '-lm' ,
-    );
-
-%autoheaders=(
-    printf => '#include <cstdio>' ,
-    );
 
 
 #$libs.= getlib("/usr/lib/libboost_regex*.a");
@@ -73,3 +71,27 @@ if($vc){
     $libs=qq(/MT /link /libpath:. /libpath:$script_home    );
 }
 
+if($mingw32){
+    $cc="i686-w64-mingw32-g++";
+    $opt.=qq(
+      -I$script_home/mingw32/blas
+      -I$script_home/mingw32/lapack
+      -I$script_home/mingw32/libpng
+      -I$script_home/mingw32/libjpeg
+      -I$script_home/mingw32/zlib
+    );
+    $libs=qq(
+      -L$script_home/mingw32/blas
+      -L$script_home/mingw32/lapack
+      -L$script_home/mingw32/libpng
+      -L$script_home/mingw32/libjpeg
+      -L$script_home/mingw32/zlib
+      -llapack
+      -lblas
+      -lgfortran
+      -ljpeg
+      -lpng
+      -lz
+      -lm
+    );
+}

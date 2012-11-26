@@ -1,7 +1,26 @@
 #ifndef C_SCRIPT_UTIL
 #define C_SCRIPT_UTIL
 
-#define MAIN(...) int main(int argc,char** argv){__VA_ARGS__}
+//#define MAIN(...) int main(int argc,char** argv){__VA_ARGS__}
+
+
+template<class T>
+struct Process{
+  FILE *gid;
+  Process(const char* cmd,const char*mode){
+    gid=popen(cmd,mode);
+  }
+  ~Process(){
+    if(gid!=NULL){
+      fflush(gid);
+      fclose(gid);
+    }
+  }
+  operator FILE* (){
+    return gid;
+  }
+};
+
 #define POPEN(gid,rw,cmd,...) \
     FILE *gid=NULL;{ \
     char buf[1024]; \

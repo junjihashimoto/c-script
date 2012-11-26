@@ -16,6 +16,7 @@ our $run_dir;
 our $cc;
 our $debug_opt;
 our $exe;
+our $output_binary;
 our $inc;
 our $libs;
 our $mod_main_src;
@@ -28,6 +29,8 @@ our $no_cache;
 our $gdb;
 our $ddd;
 
+our $mingw32;
+our $static;
 our $linux;
 our $win;
 our $init_script;
@@ -49,6 +52,9 @@ $win   = $^O eq "MSWin32" ? 1 : 0;
 sub show_usage{
 print << "END_OF_USAGE";
 Usage: c-script [options] script-file [script-options]
+ -o binary     just output compiled binary, not run the program
+ -mingw32      use mingw32 for linux
+ -static       use '-static' option for gcc
  -no_chk_main  disable of main-function-insertion
  -nocache      compile the program everytime
  -d            run the program under the gdb
@@ -67,6 +73,18 @@ sub get_cmd_options{
 	if($#ARGV==-1){
 	    show_usage;
 	    exit;
+	}elsif ( $op eq "-o"){
+	    shift @ARGV;
+	    $output_binary=shift @ARGV;
+	    next;
+	}elsif ( $op eq "-mingw32"){
+	    $mingw32=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-static"){
+	    $static=1;
+	    shift @ARGV;
+	    next;
 	}elsif ( $op eq "-no_chk_main"){
 	    $no_chk_main=1;
 	    shift @ARGV;
@@ -415,10 +433,12 @@ getparam($main_src);
 
 ($mod_main_src,$exe)=gen_exename();
 
+$exe=$output_binary if($output_binary);
+
 if(!$no_cache && compilep($exe,$main_src,$other_src,$inc)){
     gen_src($main_src,$mod_main_src);
     compile();
 }
 
-run();
+run() if(!$output_binary);
 
