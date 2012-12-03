@@ -338,6 +338,8 @@ sub getparam{
     while(<IN>){
 	if(/^#pragma\s+c-script:src\s+(.*)/){
 	    $other_src.=" ".realpath($1);
+	}elsif(/^#pragma\s+c-script:header\s+(.*)/){
+	    $default_header.=$1."\n";
 	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){
 	    $opt.=" ".$1;
 	}elsif(/^#pragma\s+c-script:eval\s+(.*)/){
