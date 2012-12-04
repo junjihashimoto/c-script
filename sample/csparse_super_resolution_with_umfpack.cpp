@@ -3,8 +3,12 @@
 #pragma c-script:opt -I/usr/include/suitesparse
 #pragma c-script:libs -lcsparse
 #pragma c-script:libs -lcxsparse
+#pragma c-script:libs -lumfpack
+
+#define EXTERN extern "C"
 
 #include <cs.h>
+#include <umfpack.h>
 
 #define set(A,xd,yd,v)  cs_entry (A,((x)+(y)*w),((xd)+(yd)*w), (v)) ;
 
@@ -15,6 +19,9 @@ limit(double v){
 	v> 255 ? 255 : v;
 }
 
+void usolve(cs* A,
+	   const double* b,
+	   double* x);
 
 
 
@@ -100,6 +107,7 @@ main(int argc,char** argv){
   //    (ata+cE)x=atb
   double* img= (double*)malloc(sizeof(double)*n);
   double* rhs= (double*)malloc(sizeof(double)*n);
+  double* lhs= (double*)malloc(sizeof(double)*n);
 
   cs* A      = mkcoeff(out);
   cs* AT     = cs_transpose (A, 1) ;          /* AT = A' */
@@ -121,11 +129,87 @@ main(int argc,char** argv){
 
     cs_gaxpy(AT,img,rhs);
   
-    cs_cholsol (0, ATA_EyeC,rhs);
+    //    cs_cholsol (0, ATA_EyeC,rhs);
+    usolve(ATA_EyeC,rhs,lhs);
     for(int i=0;i<n;i++)
-      out(i%in.w,i/in.w,k)=limit(rhs[i]);
+      out(i%in.w,i/in.w,k)=limit(lhs[i]);
   }
   out.write("restore.png");
   return 0;
+}
+
+/* Sample program for the UMFPACK sparse matrix solver
+
+   Based on illustrative sample from UMFPACK's QuickStart.pdf
+   with slight stylistic changes by RR.
+
+   Solves the system Ax=b, where:
+
+   A = 
+       2   3   0   0   0
+       3   0   4   0   6
+       0  -1  -3   2   0
+       0   0   1   0   0
+       0   4   2   0   1
+
+   b = (8, 45, -3, 3, 19)
+
+   The solution x is:
+
+   x = (1, 2, 3, 4, 5)
+
+   RR, November 2003
+*/
+
+void
+usolve(cs* A,
+      const double* b,
+      double* x){
+  void *Symbolic=NULL, *Numeric=NULL;
+  int i;
+  cs* A2=cs_compress(A);
+  cs_spfree(A2);
+  
+
+  for(int j=0;j<A->m;j++)
+    assert(A->p>=0);
+  for(int j=0;j<A->p[A->m];j++)
+    assert(A->i>=0);
+
+  /* symbolic analysis */
+  int v;
+  v=umfpack_di_symbolic(A->m,
+		      A->n,
+		      A->p,
+		      A->i,
+		      A->x,
+		      &Symbolic,
+		      NULL,
+		      NULL);
+  double Control [UMFPACK_CONTROL] ;
+  Control[UMFPACK_PRL]=200;
+  umfpack_di_report_matrix(A->m,
+			   A->n,
+			   A->p,
+			   A->i,
+			   A->x,
+			   0,
+			   Control);
+  assert(v==0);
+
+  /* LU factorization */
+  v=umfpack_di_numeric(A->p,
+		     A->i,
+		     A->x,
+		     Symbolic,
+		     &Numeric,
+		     NULL,
+		     NULL);
+  assert(v==0);
+  umfpack_di_free_symbolic(&Symbolic);
+
+  /* solve system */
+  umfpack_di_solve(UMFPACK_A, A->p, A->i, A->x, x, b, Numeric, NULL, NULL);
+  umfpack_di_free_numeric(&Numeric);
 }
 
