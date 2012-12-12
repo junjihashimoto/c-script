@@ -157,12 +157,6 @@ sub init{
 	$home=$ENV{HOME}."/.c-script";
     }
 
-    if($clean){
-	my $h=$home."/cache";
-	for(glob $h."/*"){
-	    unlink $_;
-	}
-    }
 }
 
 sub setup{
@@ -185,6 +179,13 @@ sub setup{
 
 
     $run_dir=dirname $main_src;
+
+    if($clean){
+	my $h=$home."/cache";
+	for(glob $h."/*"){
+	    unlink $_;
+	}
+    }
 
 #    for(glob $script_home."/*.h"){
 #	$inc.=" ".realpath($1);
