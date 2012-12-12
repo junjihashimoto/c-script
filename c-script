@@ -12,6 +12,7 @@ our $debug;
 our $home;
 our $main_src;
 our $run_dir;
+our $exp;
 
 our $cc;
 our $debug_opt;
@@ -50,21 +51,21 @@ $linux = $^O eq "linux" ? 1 : 0;
 $win   = $^O eq "MSWin32" ? 1 : 0;
 
 sub show_usage{
-print << "END_OF_USAGE";
+    print << "END_OF_USAGE";
 Usage: c-script [options] script-file [script-options]
- -o binary     just output compiled binary, not run the program
- -e expression read expression from command-line, not read script-file
- -mingw32      use mingw32 for linux
- -static       use '-static' option for gcc
- -no_chk_main  disable of main-function-insertion
- -nocache      compile the program everytime
- -d            run the program under the gdb
- -gdb          run the program under the gdb
- -ddd          run the program under the ddd
- -vc           run the program under the visual studio
- -show         output code after preprocess
- -cmd          output compiler-options
- -clean        remove cache of both exe and source
+    -o binary     just output compiled binary, not run the program
+    -e expression read expression from command-line, not read script-file
+    -mingw32      use mingw32 for linux
+    -static       use '-static' option for gcc
+    -no_chk_main  disable of main-function-insertion
+    -nocache      compile the program everytime
+    -d            run the program under the gdb
+    -gdb          run the program under the gdb
+    -ddd          run the program under the ddd
+    -vc           run the program under the visual studio
+    -show         output code after preprocess
+    -cmd          output compiler-options
+    -clean        remove cache of both exe and source
 END_OF_USAGE
 }
 
@@ -97,8 +98,7 @@ sub get_cmd_options{
 	    next;
 	}elsif ( $op eq "-e"){
 	    shift @ARGV;
-	    my $exp=shift @ARGV;
-	    unshift @ARGV,set_exp_file($exp);
+	    $exp=shift @ARGV;
 	    last;
 	}elsif ( $op eq "-static"){
 	    $static=1;
@@ -160,6 +160,17 @@ sub init{
 }
 
 sub setup{
+    if($clean){
+	my $h=$home."/cache";
+	for(glob $h."/*"){
+	    unlink $_;
+	}
+    }
+
+    if($exp){
+	unshift @ARGV,set_exp_file($exp);
+    }
+
     $script_home=realpath(dirname  $0);
     $script_name=basename $0;
 
@@ -177,15 +188,7 @@ sub setup{
 
     $main_src=~s/\\/\//g if($win); 
 
-
     $run_dir=dirname $main_src;
-
-    if($clean){
-	my $h=$home."/cache";
-	for(glob $h."/*"){
-	    unlink $_;
-	}
-    }
 
 #    for(glob $script_home."/*.h"){
 #	$inc.=" ".realpath($1);
@@ -414,7 +417,7 @@ sub compile{
     `$cmd`;
     my $exit_value = $? >> 8;
     popd
-    exit if($exit_value!=0);
+	exit if($exit_value!=0);
     chmodx $exe if(!$win);
 }
 
