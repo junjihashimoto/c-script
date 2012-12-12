@@ -53,6 +53,7 @@ sub show_usage{
 print << "END_OF_USAGE";
 Usage: c-script [options] script-file [script-options]
  -o binary     just output compiled binary, not run the program
+ -e expression read expression from command-line, not read script-file
  -mingw32      use mingw32 for linux
  -static       use '-static' option for gcc
  -no_chk_main  disable of main-function-insertion
@@ -65,6 +66,17 @@ Usage: c-script [options] script-file [script-options]
  -cmd          output compiler-options
  -clean        remove cache of both exe and source
 END_OF_USAGE
+}
+
+sub set_exp_file{
+    my ($exp)=@_;
+    my ($exe,$suffix)=gen_exe($exp);
+    my $file=${exe}.${suffix};
+    local* OUT; 
+    open OUT,">$file";
+    print OUT $exp;	    
+    close OUT;
+    return $file;
 }
 
 sub get_cmd_options{
@@ -81,6 +93,11 @@ sub get_cmd_options{
 	    $mingw32=1;
 	    shift @ARGV;
 	    next;
+	}elsif ( $op eq "-e"){
+	    shift @ARGV;
+	    my $exp=shift @ARGV;
+	    unshift @ARGV,set_exp_file($exp);
+	    last;
 	}elsif ( $op eq "-static"){
 	    $static=1;
 	    shift @ARGV;
@@ -131,6 +148,21 @@ sub get_cmd_options{
     }
 }
 
+sub init{
+    if($win){
+	$home=$script_home."/.c-script";
+    }else{
+	$home=$ENV{HOME}."/.c-script";
+    }
+
+    if($clean){
+	my $h=$home."/cache";
+	for(glob $h."/*"){
+	    unlink $_;
+	}
+    }
+}
+
 sub setup{
     $script_home=realpath(dirname  $0);
     $script_name=basename $0;
@@ -151,18 +183,7 @@ sub setup{
 
 
     $run_dir=dirname $main_src;
-    if($win){
-	$home=$script_home."/.c-script";
-    }else{
-	$home=$ENV{HOME}."/.c-script";
-    }
 
-    if($clean){
-	my $h=$home."/cache";
-	for(glob $h."/*"){
-	    unlink $_;
-	}
-    }
 #    for(glob $script_home."/*.h"){
 #	$inc.=" ".realpath($1);
 #	print $1;
@@ -171,6 +192,7 @@ sub setup{
 #    exit;
 
 }
+
 
 sub getlib{
     my $path=shift;
@@ -266,6 +288,9 @@ sub gen_src{
     my $nomain=1;
 
     my ($suffix)=($script_name =~ /\.([^.]*$)/);
+    local* IN_MAIN;
+    local* IN;
+    local* OUT;
 
     if(!$no_chk_main){
 	open IN_MAIN,"<$main_src";
@@ -321,6 +346,8 @@ sub gen_src{
 	}
 	
     }
+    close IN;
+    
     $code.="  return 0;\n}\n" if($nomain);
     print OUT $code;
     close OUT;
@@ -424,6 +451,8 @@ sub compilep{
     }
     return $c;
 }
+
+init();
 
 get_cmd_options();
 
