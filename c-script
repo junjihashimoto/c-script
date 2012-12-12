@@ -72,10 +72,12 @@ sub set_exp_file{
     my ($exp)=@_;
     my ($exe,$suffix)=gen_exe($exp);
     my $file=${exe}.${suffix};
-    local* OUT; 
-    open OUT,">$file";
-    print OUT $exp;	    
-    close OUT;
+    if(! -f $file) {
+	local* OUT; 
+	open OUT,">$file";
+	print OUT $exp;	    
+	close OUT;
+    }
     return $file;
 }
 
