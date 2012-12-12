@@ -76,7 +76,9 @@ sub set_exp_file{
     if(! -f $file) {
 	local* OUT; 
 	open OUT,">$file";
-	print OUT $exp;	    
+	print OUT "  ";
+	print OUT $exp;
+	print OUT "\n";
 	close OUT;
     }
     return $file;
@@ -256,7 +258,7 @@ sub gen_exe{
     my ($s)=split ' ', md5_hex("$main_src$inc$other_src");
     my ($suffix)=($main_src =~ /(\.[^.]*$)/);
     my $h=$home."/cache";
-    if(!$suffix){
+    if(!$suffix||$exp){
 	$suffix=".cpp";
     }
     if( ! -d $home){
