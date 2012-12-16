@@ -24,7 +24,7 @@ $normal_opt=qq(
 -DNDEBUG
 -mfpmath=sse
 -mmmx
--mavx
+-msse2
 -march=native
 -ftree-vectorize
 --no-warn
