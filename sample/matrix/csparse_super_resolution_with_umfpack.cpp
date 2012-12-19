@@ -47,6 +47,7 @@ mkcoeff(const BMP& in){
       }
     }
   AR = cs_compress (A) ;             /* Eye = speye (m) */
+
   cs_spfree(A);
 
   return AR;
@@ -73,8 +74,8 @@ mkeyec(const BMP& in,double c){
 
 int
 main(int argc,char** argv){
-  BMP in2(argv[1]);
-  BMP in(128,128);
+  BMP in2("testimg.bmp");
+  BMP in(3,3);
 
   // bmp_for(in)
   //   in(x,y)=in2(x+500,y+200);
@@ -112,9 +113,15 @@ main(int argc,char** argv){
   cs* A      = mkcoeff(out);
   cs* AT     = cs_transpose (A, 1) ;          /* AT = A' */
   cs* ATA    = cs_multiply (AT, A) ;
+  cs_di_print(ATA,0);
+
   double c   = 0.01;
   cs* EyeC   = mkeyec(out,c);
   cs* ATA_EyeC = cs_add(ATA,EyeC,1.0,1.0);
+  // cs* E = cs_compress(ATA_EyeC);
+
+  // cs_di_print(cs_compress(EyeC) ,0);
+  // return 0;
 
   cs_spfree(ATA);
   cs_spfree(EyeC);
@@ -129,8 +136,7 @@ main(int argc,char** argv){
 
     cs_gaxpy(AT,img,rhs);
   
-    //    cs_cholsol (0, ATA_EyeC,rhs);
-    usolve(ATA_EyeC,rhs,lhs);
+    //    usolve(ATA_EyeC,rhs,lhs);
     for(int i=0;i<n;i++)
       out(i%in.w,i/in.w,k)=limit(lhs[i]);
   }
@@ -167,8 +173,8 @@ usolve(cs* A,
       double* x){
   void *Symbolic=NULL, *Numeric=NULL;
   int i;
-  cs* A2=cs_compress(A);
-  cs_spfree(A2);
+  // cs* A2=cs_compress(A);
+  // cs_spfree(A2);
   
 
   for(int j=0;j<A->m;j++)
@@ -211,5 +217,41 @@ usolve(cs* A,
   /* solve system */
   umfpack_di_solve(UMFPACK_A, A->p, A->i, A->x, x, b, Numeric, NULL, NULL);
   umfpack_di_free_numeric(&Numeric);
+}
+
+
+int
+test_main(int argc,char** argv){
+  cs* A=cs_spalloc(5,5,25,1,1);
+  cs_entry(A,0,0,2);
+  cs_entry(A,0,1,3);
+  cs_entry(A,1,0,3);
+  cs_entry(A,1,2,4);
+  cs_entry(A,1,4,6);
+  cs_entry(A,2,1,-1);
+  cs_entry(A,2,2,-3);
+  cs_entry(A,2,3,2);
+  cs_entry(A,3,2,1);
+  cs_entry(A,4,1,4);
+  cs_entry(A,4,2,2);
+  cs_entry(A,4,4,1);
+  
+  cs* AR = cs_compress (A);
+  cs_spfree(A);
+
+  double* b=(double*)malloc(sizeof(double)*5);
+  double* x=(double*)malloc(sizeof(double)*5);
+  b[0]=8;
+  b[1]=45;
+  b[2]=-3;
+  b[3]=3;
+  b[4]=19;
+
+  usolve(AR,b,x);
+  for(int i=0;i<5;i++)
+    printf("%f\n",x[i]);
+  
+    
+  return 0;
 }
 
