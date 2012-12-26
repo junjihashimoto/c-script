@@ -27,6 +27,8 @@ our $other_src;
 our $no_chk_main;
 our $no_cache;
 
+our $syntax;
+
 our $gdb;
 our $ddd;
 
@@ -57,6 +59,7 @@ Usage: c-script [options] script-file [script-options]
     -e expression read expression from command-line, not read script-file
     -mingw32      use mingw32 for linux
     -static       use '-static' option for gcc
+    -syntax       use '-fsyntax-only' option for gcc
     -no_chk_main  disable of main-function-insertion
     -nocache      compile the program everytime
     -d            run the program under the gdb
@@ -111,6 +114,11 @@ sub get_cmd_options{
 	    shift @ARGV;
 	    next;
 	}elsif ( $op eq "-nocache"){
+	    $no_cache=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-syntax"){
+	    $syntax=1;
 	    $no_cache=1;
 	    shift @ARGV;
 	    next;
@@ -243,6 +251,11 @@ sub load_init_pl{
     }else{
 	$opt=$normal_opt.' '.$opt;
     }
+    
+    if($syntax){
+	$opt.=' '."-fsyntax-only";
+    }
+
 }
 
 sub modtime{
@@ -474,10 +487,16 @@ getparam($main_src);
 
 $exe=$output_binary if($output_binary);
 
-if(!$no_cache && compilep($exe,$main_src,$other_src,$inc)){
+if($syntax || (!$no_cache && compilep($exe,$main_src,$other_src,$inc))){
     gen_src($main_src,$mod_main_src);
     compile();
 }
 
-run() if(!$output_binary);
+if($syntax||$output_binary){
+    exit 0;
+}
+    
+
+run();
+
 
