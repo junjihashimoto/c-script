@@ -71,11 +71,42 @@ mkeyec(const BMP& in,double c){
   return AR;
 }
 
+cs* cs_sorted_multiply(const cs* a, const cs* b)
+{
+//   return cs_multiply(a,b);
+
+  cs* A = cs_transpose(a, 1);
+  cs* B = cs_transpose(b, 1);
+  cs* D = cs_multiply(B,A);   /* D = B'*A' */
+  cs_spfree (A) ;
+  cs_spfree (B) ;
+  cs_dropzeros (D) ;      /* drop zeros from D */
+  cs* C = cs_transpose (D, 1) ;   /* C = D', so that C is sorted */
+  cs_spfree (D) ;
+  return C;
+}
+
+cs* cs_sorted_multiply2(const cs* a, const cs* b)
+{
+  cs* D = cs_multiply(a,b);
+  cs* E = cs_transpose(D,1);
+  cs_spfree(D);
+  cs* C = cs_transpose(E,1);
+  cs_spfree(E);
+  return C;
+}
+
 
 int
 main(int argc,char** argv){
+<<<<<<< HEAD:sample/matrix/csparse_super_resolution_with_umfpack.cpp
   BMP in2("testimg.bmp");
   BMP in(3,3);
+=======
+  BMP in2(argv[1]);
+  BMP in(in2.w,in2.h);
+  //BMP in=in2;
+>>>>>>> de0a9bd0e51db23f9dddebc21712b7be1dd1d610:sample/csparse_super_resolution_with_umfpack.cpp
 
   // bmp_for(in)
   //   in(x,y)=in2(x+500,y+200);
@@ -112,9 +143,13 @@ main(int argc,char** argv){
 
   cs* A      = mkcoeff(out);
   cs* AT     = cs_transpose (A, 1) ;          /* AT = A' */
+<<<<<<< HEAD:sample/matrix/csparse_super_resolution_with_umfpack.cpp
   cs* ATA    = cs_multiply (AT, A) ;
   cs_di_print(ATA,0);
 
+=======
+  cs* ATA    = cs_sorted_multiply (AT, A) ;
+>>>>>>> de0a9bd0e51db23f9dddebc21712b7be1dd1d610:sample/csparse_super_resolution_with_umfpack.cpp
   double c   = 0.01;
   cs* EyeC   = mkeyec(out,c);
   cs* ATA_EyeC = cs_add(ATA,EyeC,1.0,1.0);
@@ -136,7 +171,13 @@ main(int argc,char** argv){
 
     cs_gaxpy(AT,img,rhs);
   
+<<<<<<< HEAD:sample/matrix/csparse_super_resolution_with_umfpack.cpp
     //    usolve(ATA_EyeC,rhs,lhs);
+=======
+    //    cs_cholsol (0, ATA_EyeC,rhs);
+    printf("start usolve:%d\n",k);
+    usolve(ATA_EyeC,rhs,lhs);
+>>>>>>> de0a9bd0e51db23f9dddebc21712b7be1dd1d610:sample/csparse_super_resolution_with_umfpack.cpp
     for(int i=0;i<n;i++)
       out(i%in.w,i/in.w,k)=limit(lhs[i]);
   }
@@ -173,8 +214,11 @@ usolve(cs* A,
       double* x){
   void *Symbolic=NULL, *Numeric=NULL;
   int i;
+<<<<<<< HEAD:sample/matrix/csparse_super_resolution_with_umfpack.cpp
   // cs* A2=cs_compress(A);
   // cs_spfree(A2);
+=======
+>>>>>>> de0a9bd0e51db23f9dddebc21712b7be1dd1d610:sample/csparse_super_resolution_with_umfpack.cpp
   
 
   for(int j=0;j<A->m;j++)
@@ -192,16 +236,17 @@ usolve(cs* A,
 		      &Symbolic,
 		      NULL,
 		      NULL);
-  double Control [UMFPACK_CONTROL] ;
-  Control[UMFPACK_PRL]=200;
-  umfpack_di_report_matrix(A->m,
-			   A->n,
-			   A->p,
-			   A->i,
-			   A->x,
-			   0,
-			   Control);
   assert(v==0);
+  
+  // double Control [UMFPACK_CONTROL] ;
+  // Control[UMFPACK_PRL]=200;
+  // umfpack_di_report_matrix(A->m,
+  // 			   A->n,
+  // 			   A->p,
+  // 			   A->i,
+  // 			   A->x,
+  // 			   0,
+  // 			   Control);
 
   /* LU factorization */
   v=umfpack_di_numeric(A->p,

@@ -6,30 +6,28 @@ $default_header="#include <c-script.h>\n";
 
 $output_opt="-o ";
 
+
+$normal_opt=qq(
+-O4
+-DNDEBUG
+-march=native
+--no-warn
+);
+
+$normal_opt=qq(
+-O4
+-DNDEBUG
+);
+
 $normal_opt=qq(
 -O4
 -DNDEBUG
 -mfpmath=sse
 -mmmx
--msse
 -msse2
--msse3
--m3dnow
 -march=native
 -ftree-vectorize
 --no-warn
-);
-
-$normal_opt=qq(
--O4
--DNDEBUG
--march=native
---no-warn
-);
-
-$normal_opt=qq(
--O4
--DNDEBUG
 );
     
 $debug_opt ="-g";
