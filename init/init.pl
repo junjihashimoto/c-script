@@ -14,10 +14,6 @@ $normal_opt=qq(
 --no-warn
 );
 
-$normal_opt=qq(
--O4
--DNDEBUG
-);
 
 $normal_opt=qq(
 -O4
@@ -30,6 +26,11 @@ $normal_opt=qq(
 --no-warn
 );
     
+$normal_opt=qq(
+-O4
+);
+
+
 $debug_opt ="-g";
 
 $opt=qq(
