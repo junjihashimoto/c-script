@@ -394,7 +394,7 @@ bool      operator ==(const Matrix<T>& a,const Matrix<T>& b){
      a.ncol()==b.ncol()){
     for(int c=0;c<a.ncol();c++)
       for(int r=0;r<a.nrow();r++)
-	if(a.get(r,c)!=b.get(r,c))
+	if(a(r,c)!=b(r,c))
 	  return false;
     return true;
   }else{
