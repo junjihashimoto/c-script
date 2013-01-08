@@ -39,36 +39,5 @@ struct Process{
 
 
 
-template<class T>
-vector<T>
-split(const T& str,char delim){
-  vector<T> buf;
-  int pos=0;
-  int p;
-  if(str.length()==0)
-    return buf;
-  while((p=str.find(delim,pos))!=string::npos){
-    buf.push_back(str.substr(pos,p-pos));
-    pos=p+1;
-  }
-
-  buf.push_back(str.substr(pos));
-  return buf;
-}
-
-template<class T>
-int
-getline(FILE* in,T& buf){
-  buf="";
-  int v;
-  while((v=fgetc(in))!=EOF){
-    buf+=(char)v;
-    if(v=='\n')
-      return 1;
-  }
-  return 0;
-}
-
-
 #endif
 

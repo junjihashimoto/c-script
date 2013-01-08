@@ -8,6 +8,7 @@ struct color{
   color();
   color(T r,T g,T b);
   T& operator[](int k);
+  const T& operator[](int k)const ;
 };
 
 template<class T> int operator ==(color<T>& a,color<T>& b);
@@ -36,6 +37,19 @@ color<T>::color(T r,T g,T b){
 template<class T>
 T& 
 color<T>::operator[](int k){
+  switch(k){
+  case 0:
+    return r;
+  case 1:
+    return g;
+  default:
+    return b;
+  }
+}
+
+template<class T>
+const T& 
+color<T>::operator[](int k)const {
   switch(k){
   case 0:
     return r;
