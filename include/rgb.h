@@ -11,8 +11,14 @@ struct color{
   const T& operator[](int k)const ;
 };
 
-template<class T> int operator ==(color<T>& a,color<T>& b);
-template<class T> int operator !=(color<T>& a,color<T>& b);
+template<class T> T        nrm(const color<T>& a);
+template<class T> color<T> abs(const color<T>& a);
+template<class T> color<T> operator -(const color<T>& a,const color<T>& b);
+template<class T> color<T> operator +(const color<T>& a,const color<T>& b);
+template<class T> color<T> operator *(const color<T>& a,const color<T>& b);
+template<class T> color<T> operator /(const color<T>& a,const color<T>& b);
+template<class T> int      operator ==(const color<T>& a,const color<T>& b);
+template<class T> int      operator !=(const color<T>& a,const color<T>& b);
 
 typedef color<int> RGB;
 
@@ -63,7 +69,7 @@ color<T>::operator[](int k)const {
 
 template<class T>
 int
-operator ==(color<T>& a,color<T>& b){
+operator ==(const color<T>& a,const color<T>& b){
   return
     a.r==b.r &&
     a.g==b.g &&
@@ -72,7 +78,7 @@ operator ==(color<T>& a,color<T>& b){
 
 template<class T>
 int
-operator !=(color<T>& a,color<T>& b){
+operator !=(const color<T>& a,const color<T>& b){
   return
     !(a.r==b.r &&
       a.g==b.g &&
