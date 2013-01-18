@@ -7,6 +7,7 @@ struct color{
   void init(T r,T g,T b);
   color();
   color(T r,T g,T b);
+  int size() const;
   T& operator[](int k);
   const T& operator[](int k)const ;
 };
@@ -23,6 +24,7 @@ template<class T> int      operator ==	(const color<T>& a,const color<T>& b);
 template<class T> int      operator !=	(const color<T>& a,const color<T>& b);
 
 typedef color<int> RGB;
+typedef color<unsigned char> RGBb;
 
 template<class T>
 void
@@ -32,6 +34,7 @@ color<T>::init(T r,T g,T b){
   this->b=b;
 }
 
+
 template<class T>
 color<T>::color(){
   init(0,0,0);
@@ -40,6 +43,12 @@ color<T>::color(){
 template<class T>
 color<T>::color(T r,T g,T b){
   init(r,g,b);
+}
+
+template<class T>
+int 
+color<T>::size() const{
+  return 3;
 }
 
 template<class T>

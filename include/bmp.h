@@ -22,6 +22,7 @@ extern "C"{
 #include <string>
 
 #include <rgb.h>
+#include <rgba.h>
 
 
 #define bmp_for2(bmp)	 \
@@ -37,9 +38,9 @@ extern "C"{
 
 
 
-template<class T>
+template<class T,class COLOR=color<T> >
 struct Bitmap{
-  color<T>* rgb;
+  COLOR* rgb;
   int w;
   int h;
   
@@ -57,10 +58,10 @@ struct Bitmap{
 
   
   Bitmap&         operator =  (const Bitmap& b);
-  color<T>&       operator [] (int k);
-  const color<T>& operator [] (int k)const;
-  color<T>&       operator () (int x,int y);
-  const color<T>& operator () (int x,int y)const;
+  COLOR&          operator [] (int k);
+  const COLOR&    operator [] (int k)const;
+  COLOR&          operator () (int x,int y);
+  const COLOR&    operator () (int x,int y)const;
   T&              operator () (int x,int y,int z);
   const T&        operator () (int x,int y,int z)const;
   Bitmap&         operator *= (T v);
@@ -88,95 +89,106 @@ typedef Bitmap<unsigned char> BMPb;
 typedef Bitmap<float>         BMPf;
 typedef Bitmap<double>        BMPd;
 
-template<class T>
-Bitmap<T>::Bitmap(){
+typedef Bitmap<int,color4<int> >                     BMP4;
+typedef Bitmap<int,color4<int> >                     BMP4i;
+typedef Bitmap<short,color4<short> >                 BMP4s;
+typedef Bitmap<unsigned char,color4<unsigned char> > BMP4b;
+typedef Bitmap<float,color4<float> >                 BMP4f;
+typedef Bitmap<double,color4<double> >               BMP4d;
+
+template<class T,class COLOR>
+Bitmap<T,COLOR>::Bitmap(){
   rgb=NULL;
   w=0;
   h=0;
 }
 
-template<class T>
-Bitmap<T>::Bitmap(int w,int h){
+template<class T,class COLOR>
+Bitmap<T,COLOR>::Bitmap(int w,int h){
   rgb=NULL;
   init(w,h);
 }
 
-template<class T>
-Bitmap<T>::Bitmap(const char* file){
+template<class T,class COLOR>
+Bitmap<T,COLOR>::Bitmap(const char* file){
   rgb=NULL;
   w=0;
   h=0;
   read(file,-1,-1);
 }
 
-template<class T>
-Bitmap<T>::Bitmap(const Bitmap& bmp){
+template<class T,class COLOR>
+Bitmap<T,COLOR>::Bitmap(const Bitmap& bmp){
   rgb=NULL;
   w=0;
   h=0;
   copy(bmp);
 }
 
-template<class T>
-Bitmap<T>::~Bitmap(){
+template<class T,class COLOR>
+Bitmap<T,COLOR>::~Bitmap(){
   if(rgb!=NULL){
     free(rgb);
     rgb=NULL;
   }
 }
 
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::clear(){
-  memset(rgb,0,sizeof(color<T>)*w*h);
+Bitmap<T,COLOR>::clear(){
+  memset(rgb,0,sizeof(COLOR)*w*h);
   return 0;
 }
 
 
 
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::init(int w,int h){
+Bitmap<T,COLOR>::init(int w,int h){
   if(rgb==NULL){
     this->w=w;
     this->h=h;
-    rgb=(color<T>*)malloc(sizeof(color<T>)*w*h);
+    rgb=(COLOR*)malloc(sizeof(COLOR)*w*h);
     assert(rgb!=NULL);
   }else{
-    free(rgb);
-    this->w=w;
-    this->h=h;
-    rgb=(color<T>*)malloc(sizeof(color<T>)*w*h);
-    assert(rgb!=NULL);
+    if(this->w==w&&
+       this->h==h){
+    }else{
+      free(rgb);
+      this->w=w;
+      this->h=h;
+      rgb=(COLOR*)malloc(sizeof(COLOR)*w*h);
+      assert(rgb!=NULL);
+    }
   }
   clear();
   return 0;
 }
 
 
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::init(const Bitmap<T>& bmp){
+Bitmap<T,COLOR>::init(const Bitmap<T,COLOR>& bmp){
   return init(bmp.w,bmp.h);
 }
 
 
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::copy(const Bitmap<T>& bmp){
+Bitmap<T,COLOR>::copy(const Bitmap<T,COLOR>& bmp){
   init(bmp.w,bmp.h);
-  memcpy(rgb,bmp.rgb,sizeof(color<T>)*w*h);
+  memcpy(rgb,bmp.rgb,sizeof(COLOR)*w*h);
   return 0;
 }
 
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::swap(Bitmap& bmp){
+Bitmap<T,COLOR>::swap(Bitmap& bmp){
   assert(rgb==NULL);
   assert(bmp.rgb==NULL);
   assert(bmp.w*bmp.h==w*h);
 
-  color<T>* t=rgb;
+  COLOR* t=rgb;
   rgb=bmp.rgb;
   bmp.rgb=t;
   return 0;
@@ -185,71 +197,71 @@ Bitmap<T>::swap(Bitmap& bmp){
 
 
 
-template<class T>
-Bitmap<T>&
-Bitmap<T>::operator = (const Bitmap& b){
+template<class T,class COLOR>
+Bitmap<T,COLOR>&
+Bitmap<T,COLOR>::operator = (const Bitmap& b){
   init(b);
-  memcpy(rgb,b.rgb,sizeof(color<T>)*h*w);
+  memcpy(rgb,b.rgb,sizeof(COLOR)*h*w);
   return *this;
 }
 
-template<class T>
-Bitmap<T>&
-Bitmap<T>::operator *= (T v){
+template<class T,class COLOR>
+Bitmap<T,COLOR>&
+Bitmap<T,COLOR>::operator *= (T v){
   bmp_for3((*this))
     (*this)(x,y,z)*=v;
   return *this;
 }
 
-template<class T>
-Bitmap<T>&
-Bitmap<T>::operator /= (T v){
+template<class T,class COLOR>
+Bitmap<T,COLOR>&
+Bitmap<T,COLOR>::operator /= (T v){
   bmp_for3((*this))
     (*this)(x,y,z)/=v;
   return *this;
 }
   
 
-template<class T>
-color<T>&
-Bitmap<T>::operator [] (int k){
+template<class T,class COLOR>
+COLOR&
+Bitmap<T,COLOR>::operator [] (int k){
   return rgb[k];
 }
 
-template<class T>
-const color<T>&
-Bitmap<T>::operator [] (int k)const{
+template<class T,class COLOR>
+const COLOR&
+Bitmap<T,COLOR>::operator [] (int k)const{
   return rgb[k];
 }
 
-template<class T>
-color<T>&
-Bitmap<T>::operator () (int x,int y){
+template<class T,class COLOR>
+COLOR&
+Bitmap<T,COLOR>::operator () (int x,int y){
   return rgb[y*w+x];
 }
 
-template<class T>
-const color<T>&
-Bitmap<T>::operator () (int x,int y)const{
+template<class T,class COLOR>
+const COLOR&
+Bitmap<T,COLOR>::operator () (int x,int y)const{
   return rgb[y*w+x];
 }
 
-template<class T>
+template<class T,class COLOR>
 T&
-Bitmap<T>::operator () (int x,int y,int z){
+Bitmap<T,COLOR>::operator () (int x,int y,int z){
   return rgb[y*w+x][z];
 }
 
-template<class T>
+template<class T,class COLOR>
 const T&
-Bitmap<T>::operator () (int x,int y,int z)const{
+Bitmap<T,COLOR>::operator () (int x,int y,int z)const{
   return rgb[y*w+x][z];
 }
   
   
-template<class T>
+template<class T,class COLOR>
 int
-Bitmap<T>::check(const char* file){
+Bitmap<T,COLOR>::check(const char* file){
   FILE *fp;
   char buf[4];
   std::string fname=file;
@@ -276,9 +288,9 @@ Bitmap<T>::check(const char* file){
     return 0;
 }
   
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::read(const char* file,int w,int h){
+Bitmap<T,COLOR>::read(const char* file,int w,int h){
   FILE *fp;
   char buf[4];
   std::string fname=file;
@@ -303,9 +315,9 @@ Bitmap<T>::read(const char* file,int w,int h){
   return;
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::readBmp(const char* filename){
+Bitmap<T,COLOR>::readBmp(const char* filename){
   int16_t bpp;
   unsigned char *begin,*pos;
   unsigned char *parret;
@@ -335,13 +347,12 @@ Bitmap<T>::readBmp(const char* filename){
   unsigned char ppos;
   
   for(int y=0;y<h;y++){
-
     pos=begin+
       (w * bpp/8+
        (4-(w * bpp/8)%4)%4
        )*(h-y-1);
     for(int x=0;x<w;x++){
-      color<T>& c=rgb[w*y+x];
+      COLOR& c=rgb[w*y+x];
       switch(bpp){
       case 1:
 	ppos=(*pos>>(7-x%8))&0x1;
@@ -395,9 +406,9 @@ Bitmap<T>::readBmp(const char* filename){
   fclose(file);
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::readPng(const char* file){
+Bitmap<T,COLOR>::readPng(const char* file){
   char header[8];// 8 is the maximum size that can be checked
   png_structp  png_ptr;
   png_infop    info_ptr;
@@ -471,9 +482,9 @@ Bitmap<T>::readPng(const char* file){
   fclose(fp);
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::readJpeg(const char* file){
+Bitmap<T,COLOR>::readJpeg(const char* file){
   struct jpeg_decompress_struct cinfo;
   struct jpeg_error_mgr jerr;
   JSAMPARRAY img;
@@ -511,14 +522,11 @@ Bitmap<T>::readJpeg(const char* file){
 
 
   init(width,height);
-  for (int i = 0; i < height; i++ ){
-    for (int j = 0; j < width; j++ ) {
-      rgb[i*width+j].r=img[i][j * 3 + 0];
-      rgb[i*width+j].g=img[i][j * 3 + 1];
-      rgb[i*width+j].b=img[i][j * 3 + 2];
-    }
-  }
 
+  for (int i = 0; i < height; i++ )
+    for (int j = 0; j < width; j++ ) 
+      for(int c=0;c<3;c++)
+	rgb[i*width+j][c]=img[i][j * 3 + c];
 
   for (int i = 0; i < height; i++ )
     free( img[i] );
@@ -527,9 +535,9 @@ Bitmap<T>::readJpeg(const char* file){
 
 
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::write(const char* file){
+Bitmap<T,COLOR>::write(const char* file){
   if(strstr(file,".bmp")!=NULL)
     writeBmp(file);
   else if(strstr(file,".png")!=NULL)
@@ -541,9 +549,9 @@ Bitmap<T>::write(const char* file){
     writeBmp(file);
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::writeBmp(const char* file){
+Bitmap<T,COLOR>::writeBmp(const char* file){
   unsigned char* data=NULL;
   int16_t bpp=24;
   int32_t fsize=54+(w *bpp/8+(4-(w * bpp/8)%4)%4)*h;
@@ -576,7 +584,7 @@ Bitmap<T>::writeBmp(const char* file){
   int diff=(4-(w*(bpp/8))%4)%4;
   for(int y=h-1;y>=0;y--){
     for(int x=0;x<w;x++){
-      color<T>& c=rgb[w*y+x];
+      COLOR& c=rgb[w*y+x];
       SET1(c.b);
       SET1(c.g);
       SET1(c.r);
@@ -600,9 +608,9 @@ Bitmap<T>::writeBmp(const char* file){
 
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::writePng(const char* file){
+Bitmap<T,COLOR>::writePng(const char* file){
   png_structp  png_ptr;
   png_infop    info_ptr;
   FILE *fp = fopen(file, "wb");
@@ -676,9 +684,9 @@ Bitmap<T>::writePng(const char* file){
   fclose(fp);
 }
 
-template<class T>
+template<class T,class COLOR>
 void
-Bitmap<T>::writeJpeg(const char* file){
+Bitmap<T,COLOR>::writeJpeg(const char* file){
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
   FILE *outfile;
