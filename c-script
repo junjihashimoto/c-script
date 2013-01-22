@@ -11,6 +11,7 @@ our $script_name;
 our $debug;
 our $home;
 our $main_src;
+our $dependent_src;
 our $run_dir;
 our $exp;
 
@@ -41,6 +42,7 @@ our $output_opt;
 our @dirs;
 our $show_code;
 our $show_cmd;
+our $show_depend;
 our $clean;
 
 our $default_header;
@@ -68,6 +70,7 @@ Usage: c-script [options] script-file [script-options]
     -vc           run the program under the visual studio
     -show         output code after preprocess
     -cmd          output compiler-options
+    -depend       output dependent files
     -clean        remove cache of both exe and source
 END_OF_USAGE
 }
@@ -145,6 +148,10 @@ sub get_cmd_options{
 	    next;
 	}elsif ( $op eq "-cmd"){
 	    $show_cmd=1;
+	    shift @ARGV;
+	    next;
+	}elsif ( $op eq "-depend"){
+	    $show_depend=1;
 	    shift @ARGV;
 	    next;
 	}elsif ( $op eq "-clean"){
@@ -386,6 +393,8 @@ sub getparam{
     while(<IN>){
 	if(/^#pragma\s+c-script:src\s+(.*)/){
 	    $other_src.=" ".realpath($1);
+	}elsif(/^#pragma\s+c-script:depend\s+(.*)/){
+	    $dependent_src.=" ".realpath($1);
 	}elsif(/^#pragma\s+c-script:header\s+(.*)/){
 	    $default_header.=$1."\n";
 	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){
@@ -460,11 +469,12 @@ sub compilep{
 	my @files;
 	my $t=modtime( $exe);
 	push @files,$main_src;
+	push @files,(split ' ',$dependent_src);
 	push @files,(split ' ',$other_src);
 	push @files,(split ' ',$inc);
 	
 	for(@files){
-	    if($t < modtime($_)){
+	    if((-e $_) && ($t < modtime($_))){
 		$c=1;
 		last;
 	    }
@@ -486,6 +496,16 @@ getparam($main_src);
 ($mod_main_src,$exe)=gen_exename();
 
 $exe=$output_binary if($output_binary);
+
+if($show_depend){
+    for(($main_src,(split ' ',$dependent_src." ".$other_src." ".$inc))){
+	if( -e $_){
+	    printf("%s\n",$_);
+	}
+    }
+    exit 0;
+}
+
 
 if($syntax || (!$no_cache && compilep($exe,$main_src,$other_src,$inc))){
     gen_src($main_src,$mod_main_src);
