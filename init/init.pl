@@ -33,6 +33,7 @@ $normal_opt=qq(
 
 $debug_opt ="-g";
 
+
 $opt=qq(
 -I$script_home
 -I$script_home/include
@@ -45,6 +46,11 @@ $opt=qq(
 if($static){
     $opt.=' -static ';
 }
+
+$sys_src=qq(
+$script_home/include/matrix/mat_double.cpp
+$script_home/include/matrix/mat_float.cpp
+);
 
 
 $libs=qq(

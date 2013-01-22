@@ -12,6 +12,7 @@ our $debug;
 our $home;
 our $main_src;
 our $dependent_src;
+our $sys_src;
 our $run_dir;
 our $exp;
 
@@ -252,6 +253,7 @@ sub load_init_pl{
     $debug_opt =~ s/\n/ /g;
     $opt =~ s/\n/ /g;
     $libs =~ s/\n/ /g;
+    $sys_src =~ s/\n/ /g;
     
     if($debug){
 	$opt=$debug_opt.' '.$opt;
@@ -434,7 +436,7 @@ sub chmodx{
 }
 sub compile{
     pushd $run_dir;
-    my $cmd="$cc $opt $output_opt$exe $mod_main_src $other_src $libs";
+    my $cmd="$cc $opt $output_opt$exe $mod_main_src $other_src $sys_src $libs";
     if($show_cmd){
 	print $cmd,"\n";
     }
