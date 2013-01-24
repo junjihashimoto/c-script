@@ -250,10 +250,10 @@ sub load_init_pl{
     }
 
     $normal_opt =~ s/\n/ /g;
-    $debug_opt =~ s/\n/ /g;
-    $opt =~ s/\n/ /g;
-    $libs =~ s/\n/ /g;
-    $sys_src =~ s/\n/ /g;
+    $debug_opt  =~ s/\n/ /g;
+    $opt        =~ s/\n/ /g;
+    $libs       =~ s/\n/ /g;
+    $sys_src    =~ s/\n/ /g;
     
     if($debug){
 	$opt=$debug_opt.' '.$opt;
@@ -442,8 +442,8 @@ sub compile{
     }
     `$cmd`;
     my $exit_value = $? >> 8;
-    popd
-	exit if($exit_value!=0);
+    popd();
+    exit if($exit_value!=0);
     chmodx $exe if(!$win);
 }
 
