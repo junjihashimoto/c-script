@@ -20,6 +20,7 @@ template<class T> color<T> operator -	(const color<T>& a,const color<T>& b);
 template<class T> color<T> operator +	(const color<T>& a,const color<T>& b);
 template<class T> color<T> operator *	(const color<T>& a,const color<T>& b);
 template<class T> color<T> operator /	(const color<T>& a,const color<T>& b);
+template<class T> color<T> operator /	(const color<T>& a,int v);
 template<class T> int      operator ==	(const color<T>& a,const color<T>& b);
 template<class T> int      operator !=	(const color<T>& a,const color<T>& b);
 
@@ -129,6 +130,15 @@ operator /(const color<T>& a,const color<T>& b){
   return color<T>(a.r/b.r,
 		  a.g/b.g,
 		  a.b/b.b
+		  );
+}
+
+template<class T>
+color<T>
+operator /(const color<T>& a,int v){
+  return color<T>(a.r/v,
+		  a.g/v,
+		  a.b/v
 		  );
 }
 

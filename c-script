@@ -347,8 +347,14 @@ sub gen_src{
 	
 	if(/^#!.*/){
 	    $code.="\n";
+	}elsif(/^#pragma\s+c-script:use\s+(.*)/){
+	    my $file=$script_home."/package/".$1;
+	    if(-e $file){
+		getparam $file;
+	    }
+	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^#pragma\s+c-script.*$/){
-	    $code.="\n";
+	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
 	    $inline_code=`$2`;
 	    chomp $inline_code;

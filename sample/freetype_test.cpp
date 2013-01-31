@@ -215,12 +215,16 @@ BMP
 Freetype::getstring(const char* str){
   UTF8String s(str);
   int length=s.length();
-  BMP out(w*2*length,h*2);
   int posx=0;
   int posy=0;
   int baseline=
     ((*face)->height + (*face)->descender) *
     (*face)->size->metrics.y_ppem / (*face)->units_per_EM;
+  int height=((*face)->max_advance_height) *
+    (*face)->size->metrics.y_ppem / (*face)->units_per_EM;
+  int width=((*face)->max_advance_width) *
+    (*face)->size->metrics.x_ppem / (*face)->units_per_EM;
+  BMP out(height,width);
   for(int i=0;i<length;i++){
     BMP in=get(s.get());
     int offsetx=posx+(*face)->glyph->bitmap_left;
