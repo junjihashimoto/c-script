@@ -19,6 +19,7 @@ This supports following functions.
 6. Matrix function like eigen: This uses blas and lapack.
 7. Drawing graph funtion by gnuplot
 8. c++, cuda, c, obj-c and c# are supported.
+9. package system (new!)
 
 Install
 -------
@@ -55,15 +56,21 @@ Command line options
 --------------------
 ~~~~~~
 Usage: c-script [options] script-file [script-options]
- -no_chk_main  disable of main-function-insertion
- -nocache      compile the program everytime
- -d            run the program under the gdb
- -gdb          run the program under the gdb
- -ddd          run the program under the ddd
- -vc           run the program under the visual studio
- -show         output code after preprocess
- -cmd          output compiler-options
- -clean        remove cache of both exe and source
+    -o binary     just output compiled binary, not run the program
+    -e expression read expression from command-line, not read script-file
+    -mingw32      use mingw32 for linux
+    -static       use '-static' option for gcc
+    -syntax       use '-fsyntax-only' option for gcc
+    -no_chk_main  disable of main-function-insertion
+    -nocache      compile the program everytime
+    -d            run the program under the gdb
+    -gdb          run the program under the gdb
+    -ddd          run the program under the ddd
+    -vc           run the program under the visual studio
+    -show         output code after preprocess
+    -cmd          output compiler-options
+    -depend       output dependent files
+    -clean        remove cache of both exe and source
 ~~~~~~
 
 
@@ -78,7 +85,7 @@ Pragmas
  
 #pragma c-script:do   "Run perl-script"
 #pragma c-script:cc   "compiler command name(default:g++)"
-#pragma c-script:libs "liked library options"
+#pragma c-script:libs "additional library options"
 #pragma c-script:no_default_header
 ~~~~~~
 
