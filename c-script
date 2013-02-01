@@ -347,12 +347,6 @@ sub gen_src{
 	
 	if(/^#!.*/){
 	    $code.="\n";
-	}elsif(/^#pragma\s+c-script:use\s+(.*)/){
-	    my $file=$script_home."/package/".$1;
-	    if(-e $file){
-		getparam $file;
-	    }
-	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^#pragma\s+c-script.*$/){
 	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
@@ -393,6 +387,15 @@ sub gen_src{
     }
 }
 
+sub file2str{
+    my $file=shift;
+    local *IN;
+    open IN,"<$file";
+    local $/;
+    my $str=<IN>;
+    return $str;
+}
+
 sub getparam{
     my $file=shift;
     local *IN;
@@ -403,6 +406,15 @@ sub getparam{
 	    $other_src.=" ".realpath($1);
 	}elsif(/^#pragma\s+c-script:depend\s+(.*)/){
 	    $dependent_src.=" ".realpath($1);
+	}elsif(/^#pragma\s+c-script:use\s+(.*)/){
+	    my $file=$script_home."/package/".$1;
+	    if(-e $file){
+		$default_header.=file2str($file)."\n";
+		getparam($file);
+	    }elsif( -e $1) {
+		$default_header.=file2str($1)."\n";
+		getparam($1);
+	    }
 	}elsif(/^#pragma\s+c-script:header\s+(.*)/){
 	    $default_header.=$1."\n";
 	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){

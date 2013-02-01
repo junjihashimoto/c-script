@@ -1,0 +1,5 @@
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+#pragma c-script:opt -I/usr/include/freetype2
+#pragma c-script:libs -lfreetype

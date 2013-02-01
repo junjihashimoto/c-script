@@ -1,9 +1,5 @@
 #!/usr/bin/env c-script
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#pragma c-script:opt -I/usr/include/freetype2
-#pragma c-script:libs -lfreetype
+#pragma c-script:use freetype
 
 struct UTF8String{
   unsigned char* str;
@@ -224,7 +220,7 @@ Freetype::getstring(const char* str){
     (*face)->size->metrics.y_ppem / (*face)->units_per_EM;
   int width=((*face)->max_advance_width) *
     (*face)->size->metrics.x_ppem / (*face)->units_per_EM;
-  BMP out(height,width);
+  BMP out(width*strlen(str),height);
   for(int i=0;i<length;i++){
     BMP in=get(s.get());
     int offsetx=posx+(*face)->glyph->bitmap_left;
