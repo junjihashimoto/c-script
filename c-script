@@ -311,13 +311,61 @@ sub gen_exename{
     return ($exe.$suffix,$exe);
 }
 
-sub gen_src{
-    my ($main_src,$mod_main_src)=@_;
+sub gen_src_str{
+    my $str    =shift;
+    my $add_line=shift;
     my $line=1;
-    my $code="";
-    my $inline_code="";
+    my $code;
+    my $inline_code;
     my $head;
     my $tail;
+    my $stat=0;
+    $str =~ s{^.*$}{
+      $line++;
+      $_=$&."\n";
+
+      if ($stat==0) {
+	if (/^#!.*/) {
+	  $code.="\n";
+	} elsif (/^#pragma\s+c-script:eval_begin/) {
+	  $stat=1;
+	} elsif (/^#pragma\s+c-script.*$/) {
+	  $code.="#line $line  \"$main_src\"\n" if $add_line;
+	} elsif (/^(.*)\[\[(.*)\]\](.*)$/) {
+	  $inline_code=`$2`;
+	  chomp $inline_code;
+	  $code.="$1".$inline_code."$3\n";
+	  $code.="#line $line  \"$main_src\"\n" if $add_line;
+	} elsif (/^(.*)\[\[(.*)$/) {
+	  $head=$1;
+	  $inline_code=$2;
+	} else {
+	  $code.=$_;
+	}
+      } elsif ($stat==1) {
+	if (/^#pragma\s+c-script:eval_end/) {
+	  $stat=0;
+	  $code.="#line $line  \"$main_src\"\n" if $add_line;
+	}
+      } elsif ($stat==2) {
+	if (/^(.*)\]\](.*)$/) {
+	  $inline_code.=$1;
+	  $tail=$2;
+	  $inline_code=`$inline_code`;
+	  chomp $inline_code;
+	  $code.=$head.$inline_code.$tail."\n";
+	  $code.="#line $line  \"$main_src\"\n" if $add_line;
+	}else{
+	  $inline_code.=$_;
+	}
+      }
+    }egm;
+    return $code;
+  }
+
+sub gen_src{
+    my ($main_src,$mod_main_src)=@_;
+    my $code="";
     my $nomain=1;
 
     my ($suffix)=($script_name =~ /\.([^.]*$)/);
@@ -337,59 +385,17 @@ sub gen_src{
     }
     
 
-    open IN,"<$main_src";
-    open OUT,">$mod_main_src";
     
-    $code.=$default_header;
+    $code.=gen_src_str($default_header,0);
     
     $code.="int main(int argc,char** argv){\n" if($nomain);
     
-    $code.="#line $line  \"$main_src\"\n";
-    while(<IN>){
-	$line++;
-	
-	if(/^#!.*/){
-	    $code.="\n";
-	}elsif(/^#pragma\s+c-script:eval_begin/){
-	    my $eval_exp;
-	    while(<IN>){
-		$line++;
-		last if(/^#pragma\s+c-script:eval_end/);
-		$eval_exp.=$_;
-	    }
-	    $code.="#line $line  \"$main_src\"\n";
-	}elsif(/^#pragma\s+c-script.*$/){
-	    $code.="#line $line  \"$main_src\"\n";
-	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
-	    $inline_code=`$2`;
-	    chomp $inline_code;
-	    $code.="$1".$inline_code."$3\n";
-	    $code.="#line $line  \"$main_src\"\n";
-	    
-	}elsif(/^(.*)\[\[(.*)$/){
-	    $head=$1;
-	    $inline_code=$2;
-	    while(<IN>){
-		$line++;
-		if(/^(.*)\]\](.*)$/){
-		    $inline_code.=$1;
-		    $tail=$2;
-		    last;
-		}
-	    }
-	    $inline_code=`$inline_code`;
-	    chomp $inline_code;
-	    $code.=$head.$inline_code.$tail."\n";
-	    $code.="#line $line  \"$main_src\"\n";
-	    
-	}else{
-	    $code.=$_;
-	}
-	
-    }
-    close IN;
+    $code.="#line 1  \"$main_src\"\n";
+    
+    $code.=gen_src_str(file2str($main_src),1);
     
     $code.="  return 0;\n}\n" if($nomain);
+    open OUT,">$mod_main_src";
     print OUT $code;
     close OUT;
     if($show_code){
@@ -442,7 +448,12 @@ sub load_auto_package{
 
 sub realpath2{
     my $file=shift;
-    realpath((eval '"'.$file.'"'));
+    my $str=realpath(eval '"'.$file.'"');
+    if( -e $str){
+	return $str;
+    }else{
+	$file;
+    }
 }
 
 sub getparam{
@@ -452,9 +463,13 @@ sub getparam{
     open IN,"<$file";
     while(<IN>){
 	if(/^#pragma\s+c-script:src\s+(.*)/){
-	    $other_src.=" ".realpath2($1);
+	    for(split ' ',$1){
+		$other_src.=" ".realpath2($_);
+	    }
 	}elsif(/^#pragma\s+c-script:depend\s+(.*)/){
-	    $dependent_src.=" ".realpath2($1);
+	    for(split ' ',$1){
+		$dependent_src.=" ".realpath2($_);
+	    }
 	}elsif(/^#pragma\s+c-script:use\s+(.*)/){
 	    set_package($1);
 	}elsif(/^#pragma\s+c-script:header\s+(.*)/){
@@ -481,8 +496,9 @@ sub getparam{
 	}elsif(/^#pragma\s+c-script:cc\s+(.*)/){
 	    $cc=$1;
 	}elsif(/^#pragma\s+c-script:libs\s+(.*)/){
-	    $libs=$1." ".$libs;
-	    printf "libs:$1\n";
+	    for(split ' ',$1){
+		$libs=realpath2($_)." ".$libs;
+	    }
 	}elsif(/^#pragma\s+c-script:no_cache/){
 	    $no_cache=1;
 	}elsif(/^#pragma\s+c-script:no_default_header/){

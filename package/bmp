@@ -1,4 +1,16 @@
 #include <bmp.h>
 #include <bmp_util.h>
 
-#pragma c-script:libs -ljpeg -lpng -lz
+#pragma c-script:eval_begin
+if($mingw32){
+    $opt.="-I$script_home/libs/libjpeg ";
+    $opt.="-I$script_home/libs/libpng ";
+    $opt.="-I$script_home/libs/zlib ";
+    $libs="$script_home/libs/zlib/win32/libz.a ".$libs;
+    $libs="$script_home/libs/libjpeg/win32/libjpeg.a ".$libs;
+    $libs="$script_home/libs/libpng/win32/libpng.a ".$libs;
+}else{
+    $libs=" -ljpeg -lpng -lz ".$libs;
+}
+#pragma c-script:eval_end
+
