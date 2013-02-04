@@ -435,7 +435,6 @@ sub load_auto_package{
     my $file=shift;
     for (file2words($file)){
 	if (exists $auto_package{$_}){
-	    $loaded_package{$_}=1;
 	    set_package($auto_package{$_});
 	}
     }
