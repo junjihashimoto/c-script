@@ -85,4 +85,4 @@ $(OBJDIR)/%.o:%.c  $(HEADERS)
 	if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR) ;fi
 	$(CC) -c -o $@ $< $(OPT)
 clean:
-	-rm -f $(PROGS) *.o *.a  *~
+	-rm -f $(PROGS) */*.o */*.a  *~

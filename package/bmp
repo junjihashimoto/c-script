@@ -6,6 +6,11 @@ if($mingw32){
     $opt.="-I$script_home/libs/libjpeg ";
     $opt.="-I$script_home/libs/libpng ";
     $opt.="-I$script_home/libs/zlib ";
+    if(!-e "$script_home/libs/zlib/win32/libz.a") {
+	pushd("$script_home/libs");
+	`make WIN32=1 -j`;
+	popd();
+    }
     $libs="$script_home/libs/zlib/win32/libz.a ".$libs;
     $libs="$script_home/libs/libjpeg/win32/libjpeg.a ".$libs;
     $libs="$script_home/libs/libpng/win32/libpng.a ".$libs;
