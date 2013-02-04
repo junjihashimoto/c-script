@@ -1,0 +1,12 @@
+#pragma c-script:use data
+
+#include <matrix/mat.h>
+#include <matrix/mat_util.h>
+
+#pragma c-script:libs -llapack
+#pragma c-script:libs -latlas
+#pragma c-script:libs -lblas
+#pragma c-script:libs -lgfortran
+#pragma c-script:opt  -I$script_home/include/matrix
+#pragma c-script:src  $script_home/include/matrix/mat_double.cpp
+#pragma c-script:src  $script_home/include/matrix/mat_float.cpp

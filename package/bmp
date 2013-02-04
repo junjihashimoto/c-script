@@ -1,0 +1,4 @@
+#include <bmp.h>
+#include <bmp_util.h>
+
+#pragma c-script:libs -ljpeg -lpng -lz

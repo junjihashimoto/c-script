@@ -37,7 +37,6 @@ $debug_opt ="-g";
 $opt=qq(
 -I$script_home
 -I$script_home/include
--I$script_home/include/matrix
 -L$script_home
 -I.
 -L.
@@ -48,19 +47,10 @@ if($static){
 }
 
 $sys_src=qq(
-$script_home/include/matrix/mat_double.cpp
-$script_home/include/matrix/mat_float.cpp
 );
 
 
 $libs=qq(
--llapack
--latlas
--lblas
--lgfortran
--ljpeg
--lpng
--lz
 -lm
 );
 
@@ -77,26 +67,38 @@ if($vc){
 }
 
 if($mingw32){
-    $cc="i686-w64-mingw32-g++";
-    $opt.=qq(
-      -I$script_home/mingw32/blas
-      -I$script_home/mingw32/lapack
-      -I$script_home/mingw32/libpng
-      -I$script_home/mingw32/libjpeg
-      -I$script_home/mingw32/zlib
-    );
-    $libs=qq(
-      -L$script_home/mingw32/blas
-      -L$script_home/mingw32/lapack
-      -L$script_home/mingw32/libpng
-      -L$script_home/mingw32/libjpeg
-      -L$script_home/mingw32/zlib
-      -llapack
-      -lblas
-      -lgfortran
-      -ljpeg
-      -lpng
-      -lz
-      -lm
-    );
+    if( -e "/usr/bin/i586-mingw32msvc-g++"){
+	$cc="i586-mingw32msvc-g++";
+    }elsif( -e "/usr/bin/i686-w64-mingw32-g++"){
+	$cc="i686-w64-mingw32-g++";
+    }
+    # $opt.=qq(
+    #   -I$script_home/mingw32/blas
+    #   -I$script_home/mingw32/lapack
+    #   -I$script_home/mingw32/libpng
+    #   -I$script_home/mingw32/libjpeg
+    #   -I$script_home/mingw32/zlib
+    # );
+    # $libs=qq(
+    #   -L$script_home/mingw32/blas
+    #   -L$script_home/mingw32/lapack
+    #   -L$script_home/mingw32/libpng
+    #   -L$script_home/mingw32/libjpeg
+    #   -L$script_home/mingw32/zlib
+    #   -llapack
+    #   -lblas
+    #   -lgfortran
+    #   -ljpeg
+    #   -lpng
+    #   -lz
+    #   -lm
+    # );
 }
+
+%auto_package=(
+    Matrix   => matrix,
+    Data     => data,
+    BMP      => bmp,
+    FreeType => freetype,
+);
+

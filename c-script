@@ -48,6 +48,9 @@ our $clean;
 
 our $default_header;
 
+our %auto_package;
+our %load_package;
+
 #local @dirs;
 
 $init_script="init.pl";
@@ -347,6 +350,14 @@ sub gen_src{
 	
 	if(/^#!.*/){
 	    $code.="\n";
+	}elsif(/^#pragma\s+c-script:eval_begin/){
+	    my $eval_exp;
+	    while(<IN>){
+		$line++;
+		last if(/^#pragma\s+c-script:eval_end/);
+		$eval_exp.=$_;
+	    }
+	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^#pragma\s+c-script.*$/){
 	    $code.="#line $line  \"$main_src\"\n";
 	}elsif(/^(.*)\[\[(.*)\]\](.*)$/){
@@ -393,7 +404,46 @@ sub file2str{
     open IN,"<$file";
     local $/;
     my $str=<IN>;
+    close IN;
     return $str;
+}
+
+sub file2words{
+    my $file=shift;
+    local *IN;
+    open IN,"<$file";
+    my %w;
+    map{s/\w+/$w{$&}++/ge}<IN>;
+    close IN;
+    return sort{$w{$b}-$w{$a}}keys %w;
+}
+
+sub set_package{
+    my $package=shift;
+    return if(exists $load_package{$package});
+    $load_package{$package}=1;
+    my $file=$script_home."/package/".$package;
+    if(-e $file){
+	getparam($file);
+	$default_header.=file2str($file)."\n";
+    }elsif( -e $package) {
+	getparam($package);
+	$default_header.=file2str($package)."\n";
+    }
+}
+sub load_auto_package{
+    my $file=shift;
+    for (file2words($file)){
+	if (exists $auto_package{$_}){
+	    $loaded_package{$_}=1;
+	    set_package($auto_package{$_});
+	}
+    }
+}
+
+sub realpath2{
+    my $file=shift;
+    realpath((eval '"'.$file.'"'));
 }
 
 sub getparam{
@@ -403,22 +453,28 @@ sub getparam{
     open IN,"<$file";
     while(<IN>){
 	if(/^#pragma\s+c-script:src\s+(.*)/){
-	    $other_src.=" ".realpath($1);
+	    $other_src.=" ".realpath2($1);
 	}elsif(/^#pragma\s+c-script:depend\s+(.*)/){
-	    $dependent_src.=" ".realpath($1);
+	    $dependent_src.=" ".realpath2($1);
 	}elsif(/^#pragma\s+c-script:use\s+(.*)/){
-	    my $file=$script_home."/package/".$1;
-	    if(-e $file){
-		$default_header.=file2str($file)."\n";
-		getparam($file);
-	    }elsif( -e $1) {
-		$default_header.=file2str($1)."\n";
-		getparam($1);
-	    }
+	    set_package($1);
 	}elsif(/^#pragma\s+c-script:header\s+(.*)/){
 	    $default_header.=$1."\n";
+	}elsif(/^#pragma\s+c-script:header_begin/){
+	    while(<IN>){
+		last if(/^#pragma\s+c-script:header_end/);
+		$default_header.=$_;
+	    }
 	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){
 	    $opt.=" ".$1;
+	}elsif(/^#pragma\s+c-script:eval_begin/){
+	    my $eval_exp;
+	    while(<IN>){
+		last if(/^#pragma\s+c-script:eval_end/);
+		$eval_exp.=$_;
+	    }
+	    eval $eval_exp;
+	    
 	}elsif(/^#pragma\s+c-script:eval\s+(.*)/){
 	    eval $1;
 	}elsif(/^#pragma\s+c-script:do\s+(.*)/){
@@ -426,13 +482,14 @@ sub getparam{
 	}elsif(/^#pragma\s+c-script:cc\s+(.*)/){
 	    $cc=$1;
 	}elsif(/^#pragma\s+c-script:libs\s+(.*)/){
-	    $libs.=" ".$1;
+	    $libs=$1." ".$libs;
+	    printf "libs:$1\n";
 	}elsif(/^#pragma\s+c-script:no_cache/){
 	    $no_cache=1;
 	}elsif(/^#pragma\s+c-script:no_default_header/){
 	    $default_header="\n";
 	}elsif(/^#include\s+"([^"]+)/){
-	    $inc.=" ".realpath($1);
+	    $inc.=" ".realpath2($1);
 	}
     }
     close IN;
@@ -511,6 +568,7 @@ setup();
 
 load_init_pl($main_src);
 
+load_auto_package($main_src);
 getparam($main_src);
 
 ($mod_main_src,$exe)=gen_exename();

@@ -11,10 +11,7 @@
 
 using namespace std;
 
-#include <c-script-util.h>
-#include <text.h>
-#include <bmp.h>
-#include <bmp_util.h>
-#include <plot.h>
-#include <matrix/mat.h>
-#include <matrix/mat_util.h>
+//#include <c-script-util.h>
+//#include <text.h>
+//#include <plot.h>
+
