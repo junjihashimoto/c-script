@@ -4,7 +4,7 @@ include ./Makefile.common
 #SUBDIRS=$(TLIBS:/Makefile=)
 
 
-SUBDIRS=
+SUBDIRS+=thread
 
 
 ifndef WIN32
