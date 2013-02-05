@@ -13,6 +13,8 @@ else
 SUBDIRS+=libjpeg
 SUBDIRS+=libpng
 SUBDIRS+=zlib
+SUBDIRS+=blas
+SUBDIRS+=lapack
 endif
 
 
