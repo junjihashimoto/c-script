@@ -82,14 +82,18 @@ int st=0;
 
 void
 callback(expect* exp,const char* str){
-  if(strstr(str,">")){
-    exp->write_str("x <- 1:10\n");
-    exp->write_str("y <- 1:10\n");
-    exp->write_str("plot(x,y)\n");
-    exp->write_str("plot(x,y,xlim=c(10,1))\n");
-  }else{
-    sleep(10);
-    printf("%s",str);
+  if(st==0&&strstr(str,">")){
+    exp->write_str("x <- 1:10\n"
+		   "y <- 1:10\n"
+		   "plot(x,y)\n"
+		   "plot(x,y,xlim=c(10,1))\n");
+    st=1;
+  }else if(st==1&&strstr(str,">")){
+    sleep(3);
+    exp->write_str("q()\n");
+    st=2;
+  }else if(st==2 && strstr(str,"Save workspace image? ")){
+    exp->write_str("n\n");
   }
 }
 
