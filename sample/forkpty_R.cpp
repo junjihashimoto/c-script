@@ -89,7 +89,8 @@ callback(expect* exp,const char* str){
 		   "plot(x,y,xlim=c(10,1))\n");
     st=1;
   }else if(st==1&&strstr(str,">")){
-    sleep(3);
+    printf("Press-enter for exit:\n");
+    getchar();
     exp->write_str("q()\n");
     st=2;
   }else if(st==2 && strstr(str,"Save workspace image? ")){
