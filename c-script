@@ -4,6 +4,7 @@ use Cwd qw(realpath getcwd);
 use Digest::MD5 qw(md5_hex);
 use Getopt::Long;
 use Data::Dumper;
+use File::Temp qw/ tempfile /;
 use strict;
 
 our $script_home;
@@ -311,6 +312,21 @@ sub gen_exename{
     return ($exe.$suffix,$exe);
 }
 
+sub system2{
+    my $cmd=shift;
+    local* IN;
+    my ($fh, $filename) = tempfile();
+    open IN , "| /bin/bash > $filename" or die "Cannot open bash: $!";
+    print IN "$cmd";
+    close IN;
+    
+    local $/;
+    open IN,"<$filename";
+    my $str=<IN>;
+    close IN;
+    return $str;
+}
+
 sub gen_src_str{
     my $str    =shift;
     my $add_line=shift;
@@ -332,13 +348,14 @@ sub gen_src_str{
 	} elsif (/^#pragma\s+c-script.*$/) {
 	  $code.="#line $line  \"$main_src\"\n" if $add_line;
 	} elsif (/^(.*)\[\[(.*)\]\](.*)$/) {
-	  $inline_code=`$2`;
+	  $inline_code=system2 "$2";
 	  chomp $inline_code;
 	  $code.="$1".$inline_code."$3\n";
 	  $code.="#line $line  \"$main_src\"\n" if $add_line;
 	} elsif (/^(.*)\[\[(.*)$/) {
 	  $head=$1;
 	  $inline_code=$2;
+	  $stat=2;
 	} else {
 	  $code.=$_;
 	}
@@ -351,10 +368,11 @@ sub gen_src_str{
 	if (/^(.*)\]\](.*)$/) {
 	  $inline_code.=$1;
 	  $tail=$2;
-	  $inline_code=`$inline_code`;
+	  $inline_code=system2 "$inline_code";
 	  chomp $inline_code;
 	  $code.=$head.$inline_code.$tail."\n";
 	  $code.="#line $line  \"$main_src\"\n" if $add_line;
+	  $stat=0;
 	}else{
 	  $inline_code.=$_;
 	}
