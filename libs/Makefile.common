@@ -103,6 +103,11 @@ endif
 
 endif
 
+ifdef WIN32
+OBJDIR=win32
+else
+OBJDIR=linux
+endif
 
 CC:=$(PREFIX)gcc
 CXX:=$(PREFIX)g++

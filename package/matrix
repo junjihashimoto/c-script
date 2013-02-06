@@ -3,10 +3,25 @@
 #include <matrix/mat.h>
 #include <matrix/mat_util.h>
 
-#pragma c-script:libs -llapack
-#pragma c-script:libs -latlas
-#pragma c-script:libs -lblas
-#pragma c-script:libs -lgfortran
 #pragma c-script:opt  -I$script_home/include/matrix
 #pragma c-script:src  $script_home/include/matrix/mat_double.cpp
 #pragma c-script:src  $script_home/include/matrix/mat_float.cpp
+
+#pragma c-script:eval_begin
+if($mingw32){
+    if(!-e "$script_home/libs/blas/win32/libblas.a") {
+	pushd("$script_home/libs/blas");
+	`make WIN32=1 -j`;
+	popd();
+	pushd("$script_home/libs/lapack");
+	`make WIN32=1 -j`;
+	popd();
+    }
+    $libs="$script_home/libs/blas/win32/libblas.a     ".$libs;
+    $libs="$script_home/libs/lapack/win32/liblapack.a ".$libs;
+}else{
+    $libs=" -lgfortran ".$libs;
+    $libs=" -lblas "    .$libs;
+    $libs=" -llapack "  .$libs;
+}
+#pragma c-script:eval_end

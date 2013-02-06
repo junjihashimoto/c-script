@@ -2,12 +2,6 @@ include ../Makefile.common
 
 .PHONY : clean all test
 
-ifdef WIN32
-OBJDIR=win32
-else
-OBJDIR=linux
-endif
-
 PROG= \
 $(OBJDIR)/libpng.a
 
