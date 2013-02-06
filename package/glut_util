@@ -1,0 +1,5 @@
+
+#pragma c-script:libs  -lGL -lGLU -lglut
+#pragma c-script:opt   -I$script_home/libs/glut_util
+#pragma c-script:src   $script_home/libs/glut_util/glut_util.cpp
+#include <glut_util.h>

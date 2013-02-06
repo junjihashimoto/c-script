@@ -99,6 +99,7 @@ if($mingw32){
     Matrix   => matrix,
     Data     => data,
     BMP      => bmp,
+    BMPb     => bmp,
     FreeType => freetype,
 );
 
