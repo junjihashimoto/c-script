@@ -464,9 +464,14 @@ sub load_auto_package{
     }
 }
 
+sub streval{
+    my $file=shift;
+    eval '"'.$file.'"';
+}
+
 sub realpath2{
     my $file=shift;
-    my $str=realpath(eval '"'.$file.'"');
+    my $str=realpath(streval($file));
     if( -e $str){
 	return $str;
     }else{
@@ -498,7 +503,7 @@ sub getparam{
 		$default_header.=$_;
 	    }
 	}elsif(/^#pragma\s+c-script:opt\s+(.*)/){
-	    $opt.=" ".$1;
+	    $opt.=" ".streval($1);
 	}elsif(/^#pragma\s+c-script:eval_begin/){
 	    my $eval_exp;
 	    while(<IN>){

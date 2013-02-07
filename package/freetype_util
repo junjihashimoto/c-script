@@ -1,0 +1,7 @@
+
+#pragma c-script:use bmp
+#pragma c-script:use freetype
+#pragma c-script:opt  -I$script_home/libs/freetype_util
+#pragma c-script:src  $script_home/libs/freetype_util/freetype_util.cpp
+
+#include  <freetype_util.h>
