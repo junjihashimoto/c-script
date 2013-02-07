@@ -1,17 +1,19 @@
 #include <thread.h>
 
+#pragma c-script:opt -I$script_home/libs/thread
+#pragma c-script:libs -lpthread
+
 #pragma c-script:eval_begin
-$opt.="-I$script_home/libs/thread ";
 if($mingw32){
     if(!-e "$script_home/libs/thread/win32/libthread.a") {
-	pushd("$script_home/libs");
+	pushd("$script_home/libs/thread");
 	`make WIN32=1 -j`;
 	popd();
     }
     $libs="$script_home/libs/thread/win32/libthread.a ".$libs;
 }else{
     if(!-e "$script_home/libs/thread/linux/libthread.a") {
-	pushd("$script_home/libs");
+	pushd("$script_home/libs/thread");
 	`make -j`;
 	popd();
     }

@@ -1,0 +1,8 @@
+#pragma c-script:use thread
+
+#include <vnclib.h>
+
+#pragma c-script:opt  -I$script_home/libs/vnc
+#pragma c-script:src  $script_home/libs/vnc/vnclib.cpp
+#pragma c-script:src  $script_home/libs/vnc/d3des.cpp
+

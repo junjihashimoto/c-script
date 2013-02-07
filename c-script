@@ -70,6 +70,7 @@ Usage: c-script [options] script-file [script-options]
     -no_chk_main  disable of main-function-insertion
     -nocache      compile the program everytime
     -d            run the program under the gdb
+    -dargs        run the program under the gdb with --args
     -gdb          run the program under the gdb
     -ddd          run the program under the ddd
     -vc           run the program under the visual studio
@@ -132,6 +133,11 @@ sub get_cmd_options{
 	    next;
 	}elsif ( $op eq "-d"){
 	    $debug="gdb";
+	    shift @ARGV;
+	    #next;
+	    last;
+	}elsif ( $op eq "-dargs"){
+	    $debug="gdb-args";
 	    shift @ARGV;
 	    #next;
 	    last;
@@ -564,6 +570,8 @@ sub compile{
 sub run{
     if($debug eq "gdb"){
 	exec 'gdb',@ARGV;
+    }elsif($debug eq "gdb-args"){
+	exec 'gdb','--args',@ARGV;
     }elsif($debug  eq "ddd"){
 	exec 'ddd',@ARGV;
     }elsif($debug eq "vc"){
