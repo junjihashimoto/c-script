@@ -2,8 +2,6 @@
 
 #pragma c-script:use vnc
 
-#include "vnclib.h"
-#include <unistd.h>
 int
 main(int argc,char** argv){
   VNC_Client vnc;
