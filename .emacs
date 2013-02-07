@@ -9,6 +9,18 @@
              '("c-script" . c++-mode))
 
 (require 'flymake)
+
+
+(defun display-error-message ()
+  (message (get-char-property (point) 'help-echo)))
+(defadvice flymake-goto-prev-error (after flymake-goto-prev-error-display-message)
+  (display-error-message))
+(defadvice flymake-goto-next-error (after flymake-goto-next-error-display-message)
+  (display-error-message))
+(ad-activate 'flymake-goto-prev-error 'flymake-goto-prev-error-display-message)
+(ad-activate 'flymake-goto-next-error 'flymake-goto-next-error-display-message)
+
+
 (defun flymake-c-script-init ()
   (let* ((temp-file  (flymake-init-create-temp-buffer-copy
 		      'flymake-create-temp-inplace))
