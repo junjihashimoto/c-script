@@ -76,10 +76,6 @@ Matrix<float>::operator -= (const Matrix<float>& b){
   	 &s,
   	 dat,
   	 &s);
-  sscal_(&n,
-	 &alpha,
-	 dat,
-	 &s);
   return *this;
 }
 

@@ -69,17 +69,13 @@ Matrix<double>::operator -= (const Matrix<double>& b){
   double alpha=-1.0;
   int n=nrow()*ncol();
   int s=1;
-  //b=a+alpha*b
+  //b=alpha*a+b
   daxpy_(&n,
   	 &alpha,
-  	 b.dat,
+  	 b.dat,//a
   	 &s,
-  	 dat,
+  	 dat,//b
   	 &s);
-  dscal_(&n,
-	 &alpha,
-	 dat,
-	 &s);
   return *this;
 }
 

@@ -171,7 +171,7 @@ Freetype::set_size(int w,int h){
   err = FT_Set_Pixel_Sizes(*face, w, h);
   assert(!err);
 }
-BMP
+BMPb&
 Freetype::get(int charcode){
   err = FT_Load_Char(*face, charcode, 0);
   assert(!err);
@@ -182,17 +182,41 @@ Freetype::get(int charcode){
   FT_Bitmap *bm = &((*face)->glyph->bitmap);
   int row, col, bit, c;
     
-  BMP out(bm->pitch*8,bm->rows);
-  bmp_for(out){
+  img.init(bm->pitch*8,bm->rows);
+  bmp_for(img){
     int c=((bm->buffer[bm->pitch * y + (x/8)])>>(7-(x%8)))&1 ? 255: 0;
-    out(x,y,0)=c;
-    out(x,y,1)=c;
-    out(x,y,2)=c;
+    img(x,y,0)=c;
+    img(x,y,1)=c;
+    img(x,y,2)=c;
   }
-  return out;
+  return img;
 }
 
-BMP
+void
+Freetype::_get(int charcode,int offset_x,int offset_y,int baseline){
+  err = FT_Load_Char(*face, charcode, 0);
+  assert(!err);
+  
+  err = FT_Render_Glyph((*face)->glyph, FT_RENDER_MODE_MONO);
+  assert(!err);
+
+  FT_Bitmap *bm = &((*face)->glyph->bitmap);
+  int row, col, bit, c;
+
+  offset_x+=(*face)->glyph->bitmap_left;
+  offset_y+=baseline-(*face)->glyph->bitmap_top;
+
+
+  for(int y=0;y<bm->rows;y++)
+    for(int x=0;x<bm->pitch*8;x++){
+      int c=((bm->buffer[bm->pitch * y + (x/8)])>>(7-(x%8)))&1 ? 255: 0;
+      img(offset_x+x,offset_y+y,0)=c;
+      img(offset_x+x,offset_y+y,1)=c;
+      img(offset_x+x,offset_y+y,2)=c;
+    }
+}
+
+BMPb&
 Freetype::getstring(const char* str){
   UTF8String s(str);
   int length=s.length();
@@ -205,24 +229,14 @@ Freetype::getstring(const char* str){
     (*face)->size->metrics.y_ppem / (*face)->units_per_EM;
   int width=((*face)->max_advance_width) *
     (*face)->size->metrics.x_ppem / (*face)->units_per_EM;
-  BMP out(width*strlen(str),height);
+  img.init(width*strlen(str),height);
   for(int i=0;i<length;i++){
-    BMP in=get(s.get());
-    int offsetx=posx+(*face)->glyph->bitmap_left;
-    int offsety=posy+baseline-(*face)->glyph->bitmap_top;
-    bmp_for(in){
-      int xx=offsetx+x;
-      int yy=offsety+y;
-      out(xx,yy)=in(x,y);
-      assert(xx>=0);
-      assert(yy>=0);
-      assert(xx<out.w);
-      assert(yy<out.h);
-    }
-
+    // int offsetx=posx+(*face)->glyph->bitmap_left;
+    // int offsety=posy+baseline-(*face)->glyph->bitmap_top;
+    _get(s.get(),posx,posy,baseline);
     //posx+=((*face)->glyph->metrics.horiAdvance)>>6;
     posx+=((*face)->glyph->advance.x>>6);
   }
-  return out;
+  return img;
     
 }
