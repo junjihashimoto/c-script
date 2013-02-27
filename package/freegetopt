@@ -1,0 +1,3 @@
+#include <getopt.h>
+#pragma c-script:opt  -I$script_home/libs/freegetopt
+#pragma c-script:src  $script_home/libs/freegetopt/getopt.c

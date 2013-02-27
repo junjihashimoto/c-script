@@ -45,3 +45,16 @@
 
 
 
+(defun indent-all ()
+  (interactive)
+  (indent-region (point-min) (point-max) nil)
+  )
+(fset 'perl-expand
+      "\C-r/*\C-n\C-a\C-@\C-s*/\C-a\C-[w\C-n\C-n\C-p\C-y\C-u\C-[xshell-command-on\C-i\C-mperl -M5.010\C-m")
+(global-set-key "\C-x\C-g" 'goto-line)
+(global-set-key "\C-c\C-c" 'comment-region)
+(global-set-key [(meta return)] 'indent-all)
+(global-set-key  (kbd "ESC RET") 'indent-all)
+(global-set-key  (kbd "C-<return>") 'compile)
+(global-set-key "\C-xp" 'perl-expand)
+(display-time)
