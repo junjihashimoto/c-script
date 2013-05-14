@@ -1,0 +1,4 @@
+#include <cexpect.h>
+#pragma c-script:opt  -I$script_home/libs/cexpect
+#pragma c-script:libs -lutil
+#pragma c-script:src  $script_home/libs/cexpect/cexpect.cpp
