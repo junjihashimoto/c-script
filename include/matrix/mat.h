@@ -69,6 +69,7 @@ struct Matrix{//Column Major
   void     set_row(int row,const T* ary);
   void     set_col(int col,const T* ary);
   void     zero();
+  void     one();
   void     swap(Matrix& mat);
   void     write(FILE* out=stdout,const char* format=NULL)const;
   void     read (FILE* in =stdin ,const char* format=NULL);
@@ -104,6 +105,7 @@ template<class T> Matrix<T> operator / (const Matrix<T>& a,const Matrix<T>& b);
 
 template<class T> Matrix<T> eye        (int nr,int nc);
 template<class T> Matrix<T> zero       (int nr,int nc);
+template<class T> Matrix<T> one        (int nr,int nc);
 template<class T> Matrix<T> ary_mul    (const Matrix<T>& a,const Matrix<T>& b);
 template<class T> Matrix<T> ary_div    (const Matrix<T>& a,const Matrix<T>& b);
 template<class T> bool      operator ==(const Matrix<T>& a,const Matrix<T>& b);
@@ -119,6 +121,7 @@ template<class T> Matrix<T> ave_col    (const Matrix<T>& a);
 template<class T> T         var        (const Matrix<T>& a);
 template<class T> Matrix<T> var_row    (const Matrix<T>& a);
 template<class T> Matrix<T> var_col    (const Matrix<T>& a);
+template<class T> T         sum        (const Matrix<T>& a);
 
 template<class T> void      eig_sym    (const Matrix<T>& input,
 					const Matrix<T>& eigen_value,

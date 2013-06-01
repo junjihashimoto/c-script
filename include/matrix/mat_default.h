@@ -91,6 +91,15 @@ Matrix<T>::zero(){
 
 template<class T>
 void
+Matrix<T>::one(){
+  Matrix<T> a(nr,nc);
+  mat_for(*this)
+    (*this)(r,c)=1;
+}
+
+
+template<class T>
+void
 Matrix<T>::swap(Matrix<T>& mat){
   T* d=this->dat;
   this->dat=mat.dat;
@@ -368,6 +377,14 @@ zero       (int nr,int nc){
 }
 
 
+template<class T>
+Matrix<T>
+one       (int nr,int nc){
+  Matrix<T> a(nr,nc);
+  mat_for(a)
+    a(r,c)=1;
+  return a;
+}
 
 
 template<class T>
@@ -522,6 +539,15 @@ var_col    (const Matrix<T>& a){
     r(x,0)=r(x,0)/(a.nc);
   return r;
 }
+
+template<class T> T
+sum        (const Matrix<T>& a){
+  T t=0;
+  mat_for(a)
+    t+=a(r,c);
+  return t;
+}
+
 
 template<class T>
 void
