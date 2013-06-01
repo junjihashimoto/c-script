@@ -92,8 +92,7 @@ Matrix<T>::zero(){
 template<class T>
 void
 Matrix<T>::one(){
-  Matrix<T> a(nr,nc);
-  mat_for(*this)
+  mat_for((*this))
     (*this)(r,c)=1;
 }
 

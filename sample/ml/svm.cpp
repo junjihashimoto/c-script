@@ -1,70 +1,93 @@
 #!/usr/bin/env c-script
 
 struct SVM{
-Matrix<double> X;
-Matrix<double> Y;
-Matrix<double> XX;
-Matrix<double> L;
-Matrix<double> dL;
-Matrix<double> W;
-Matrix<double> U;
-Matrix<double> one;
-double         d;
-  void init(){
-    XX=ary_mul(X*t(X),Y*t(Y));
-    mat_for(one)
-      one(r,c)=1;
-
+  Matrix<double> XX;
+  Matrix<double> YY;
+  Matrix<double> X;
+  Matrix<double> Y;
+  Matrix<double> L;
+  Matrix<double> LL;
+  Matrix<double> dL;
+  double         d;
+  Matrix<double> w;
+  Matrix<double> ones;
+  int nr,nc;
+  void init(int nr,int nc){
+    this->nr=nr;
+    this->nc=nc;
+    X.init(nr,nc);
+    Y.init(nr,1);
+    L.init(nr,1);
+    dL.init(nr,1);
+    d=0.01;
+    XX.init(nr,nr);
+    YY.init(nr,nr);
+    LL.init(nr,nr);
+    w.init(nc,1);
+    ones.init(nr,1);
+    ones.one();
   }
-  void update(){
-    dL=(one-XX*L)*d;
-    L+=dL;
+  void set(){
+    X<<
+      0,0,
+      0,0.5,
+      0,1.0,
+      0.5,0,
+      0.5,0.5,
+      0.5,1.0,
+      1,0,
+      1,0.5,
+      1,1.0;
+    Y<<
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      1,  
+      1,  
+      1,  
+      1;
+    L.zero();
+    
+    XX=X*t(X);
+    YY=Y*t(Y);
   }
   double cost(){
-    return (t(L)*one+(t(one)*ary_mul(XX,L*t(L))*one)*(-0.5))(0,0);
+    return sum(L)-0.5*sum(ary_mul(ary_mul(XX,YY),LL));
+  }
+  void update(int i,int n){
+    LL=L*t(L);
+    if(n/(i+1)<3)
+      L+=(ones-ary_mul(XX,YY)*L-YY*L*20.0)*d;
+    else
+      L+=(ones-ary_mul(XX,YY)*L-YY*L*20.0)*d;
+    mat_for(L){
+      if(L(r,c)<0)
+	L(r,c)=0;
+    }
+    w=t(X)*ary_mul(L,Y);
+
   }
 };
 
 int
 main(){
   SVM svm;
-  svm.d=0.02;
-  svm.XX.init(7,7);
-  svm.X.init(7,2);
-  svm.Y.init(7,1);
-  svm.L.init(7,1);
-  svm.one.init(7,1);
-  
-  svm.X <<
-    0,0,
-    0,0.5,
-    0,1,
-    0.5,0,
-    1,0,
-    1,0.5,
-    1,1;
-  svm.Y <<
-    -1,
-    -1,
-    -1,
-    1,
-    1,
-    1,
-    1;
-
-  svm.init();
-
-  svm.L.zero();
-  svm.L.write(stdout,"%f");
-  svm.dL.write(stdout,"%f");
-  printf("cost:%f\n",svm.cost());
-  for(int i=0;i<10000000;i++){
-    svm.update();
-    printf("cost:%f\r",svm.cost());
+  svm.init(9,2);
+  svm.set();
+  int n=100000;
+  for(int i=0;i<100000;i++){
+    svm.update(i,n);
   }
-  // svm.L.write(stdout,"%f");
-  // svm.dL.write(stdout,"%f");
+  
+  printf("L:\n");
+  svm.L.write(stdout,"%2.2f");
+  printf("w:\n");
+  svm.w.write(stdout,"%2.2f");
+  printf("LY:%f\n",dot(svm.L,svm.Y));
+  printf("cost:%f\n",svm.cost());
+
   
   return 0;
 }
-

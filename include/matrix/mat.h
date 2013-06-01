@@ -14,8 +14,8 @@ using namespace std;
 #define MAX(x,y) ((x)>=(y) ? (x) : (y))
 
 #define mat_for(mat) \
-  for(int c=0;c<mat.ncol();c++)\
-    for(int r=0;r<mat.nrow();r++)
+  for(int c=0;c<(mat).ncol();c++)		\
+    for(int r=0;r<(mat).nrow();r++)
 
 
 template<class T> struct Matrix;
