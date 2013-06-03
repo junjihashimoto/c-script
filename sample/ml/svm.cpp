@@ -67,8 +67,11 @@ struct SVM{
 	L(r,c)=0;
     }
     w=t(X)*ary_mul(L,Y);
-
   }
+  void check(){
+    
+  }
+  
 };
 
 int
