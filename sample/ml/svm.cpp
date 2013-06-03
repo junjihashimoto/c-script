@@ -9,6 +9,7 @@ struct SVM{
   Matrix<double> LL;
   Matrix<double> dL;
   double         d;
+  double         b;
   Matrix<double> w;
   Matrix<double> ones;
   int nr,nc;
@@ -56,20 +57,15 @@ struct SVM{
   double cost(){
     return sum(L)-0.5*sum(ary_mul(ary_mul(XX,YY),LL));
   }
-  void update(int i,int n){
+  void update(double d,double C){
     LL=L*t(L);
-    if(n/(i+1)<3)
-      L+=(ones-ary_mul(XX,YY)*L-YY*L*20.0)*d;
-    else
-      L+=(ones-ary_mul(XX,YY)*L-YY*L*20.0)*d;
+    L+=(ones-ary_mul(XX,YY)*L-YY*L*C)*d;
     mat_for(L){
       if(L(r,c)<0)
 	L(r,c)=0;
     }
     w=t(X)*ary_mul(L,Y);
-  }
-  void check(){
-    
+    b=sum(ary_mul(X*w,L)/sum(L));
   }
   
 };
@@ -79,15 +75,23 @@ main(){
   SVM svm;
   svm.init(9,2);
   svm.set();
-  int n=100000;
-  for(int i=0;i<100000;i++){
-    svm.update(i,n);
-  }
+  for(int i=0;i<1000;i++)
+    svm.update(0.1,1);
+  for(int i=0;i<10000;i++)
+    svm.update(0.01,10);
+  for(int i=0;i<10000;i++)
+    svm.update(0.00001,100);
+  for(int i=0;i<10000;i++)
+    svm.update(0.000001,1000);
   
   printf("L:\n");
   svm.L.write(stdout,"%2.2f");
   printf("w:\n");
   svm.w.write(stdout,"%2.2f");
+  printf("X*w-b:\n");
+  (svm.X*svm.w-svm.b).write(stdout,"%2.2f");
+  printf("wx:\n");
+  printf("b:%f\n",svm.b);
   printf("LY:%f\n",dot(svm.L,svm.Y));
   printf("cost:%f\n",svm.cost());
 

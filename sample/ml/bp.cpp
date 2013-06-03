@@ -15,6 +15,7 @@ struct BP{
       X(r,c)=sigm(S(r,c));
   }
   void update(){
+
     mat_for(Hd)
       Hd(r,c)=sigm(S(r,c))*(1-sigm(S(r,c)));
     dW=-2*ary_mul(ary_mul((D-X),Hd),Y);
@@ -22,7 +23,7 @@ struct BP{
   void update(Matrix<double>& hW,Matrix<double>& hY){
     mat_for(Hd)
       Hd(r,c)=sigm(S(r,c))*(1-sigm(S(r,c)));
-    dW=-2*ary_mul(ary_mul(t(hW*hY),Hd),Y);
+    dW=-2*ary_mul(ary_mul(t(hY*hW),Hd),Y);
   }
 };
 
