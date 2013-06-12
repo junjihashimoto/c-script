@@ -67,7 +67,6 @@ struct SVM{
     w=t(X)*ary_mul(L,Y);
     b=sum(ary_mul(X*w,L)/sum(L));
   }
-  
 };
 
 int

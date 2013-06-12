@@ -396,6 +396,11 @@ Matrix<T> ary_mul    (const Matrix<T>& a,const Matrix<T>& b){
 }
 
 template<class T>
+Matrix<T> x(const Matrix<T>& a,const Matrix<T>& b){
+  return ary_mul(a,b);
+}
+
+template<class T>
 Matrix<T> ary_div    (const Matrix<T>& a,const Matrix<T>& b){
   Matrix<T> c=a;
   for(int k=0;k<a.nc;k++)
