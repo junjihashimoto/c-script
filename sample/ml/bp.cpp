@@ -27,9 +27,13 @@ struct BP{
   Matrix<double> W[N]; 
   Matrix<double> EW[N]; 
   double d;
-  void init(){
-    
+  void set_hier(int level,int num){
+    X[level].init(num,1);
+    S[level].init(num,1);
+    ES[level].init(num,1);
+    W[level].init(num,X[level+1].nr);
   }
+
   //X[i+1]=sigm(S[i]=W[i]*X[i])
   //E/w1ij=E/S1i*S1i/w1ij
   //E/w1ij=E/X1i*X1i/S1i*S1i/w1ij
@@ -52,6 +56,7 @@ struct BP{
   }
   void
   backward(const Matrix<double>& D){
+    //E=sumi(Xn1i-Di)^2
     //E/Wn1ij=(Xn1i-Di)*hd(Sn1i)*Xnj
     //E/Wnij=sumj(E/Sn1j*Wn1ji)*hd(Sni)*X3j
     //E/Sn1i =(Xn1i-Dn1i)*hd(Sn1i);
@@ -81,6 +86,10 @@ struct BP{
 int
 main(){
   BP<1>  bp;
+  bp.set(1,1);
+  bp.set(0,4);
+
+  //  bp.update();
   
   return 0;
 }
