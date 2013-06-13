@@ -25,14 +25,24 @@ struct BP{
   Matrix<double> S[N];
   Matrix<double> ES[N];
   Matrix<double> W[N]; 
-  Matrix<double> EW[N]; 
+  Matrix<double> EW[N];
+  vector<int>    heir;
   double d;
-  void set_hier(int level,int num){
-    X[level].init(num,1);
-    S[level].init(num,1);
-    ES[level].init(num,1);
-    W[level].init(num,X[level+1].nr);
+  
+  BP&
+  operator <<(int i){
+    heir.push_back(i);
+    return *this;
   }
+  BP&
+  operator ,(int i){
+    heir.push_back(i);
+    return *this;
+  }
+  void
+  init(){
+  }
+
 
   //X[i+1]=sigm(S[i]=W[i]*X[i])
   //E/w1ij=E/S1i*S1i/w1ij
@@ -86,9 +96,12 @@ struct BP{
 int
 main(){
   BP<1>  bp;
-  bp.set(1,1);
-  bp.set(0,4);
-
+  bp<<
+    4,
+    1;//output
+  bp.init();
+  for(int i=0;i<bp.heir.size();i++)
+    printf("%d\n",bp.heir[i]);
   //  bp.update();
   
   return 0;

@@ -7,6 +7,10 @@ Matrix<T>::Matrix(){
   nc=0;
 }
 
+template<class T>
+Matrix<T>::Matrix(int nr){
+  init(nr,1);
+}
 
 template<class T>
 Matrix<T>::Matrix(int nr,int nc){
@@ -177,6 +181,12 @@ Matrix<T>::ncol() const{
   return nc;
 }
 
+template<class T>
+int
+Matrix<T>::size() const{
+  return nc*nr;
+}
+
 
 template<class T>
 T&
@@ -188,6 +198,19 @@ template<class T>
 const T&
 Matrix<T>::operator()(int row,int col)const{
   return dat[row+col*nr];
+}
+
+
+template<class T>
+T&
+Matrix<T>::operator[](int i){
+  return dat[i];
+}
+
+template<class T>
+const T&
+Matrix<T>::operator()(int i)const{
+  return dat[i];
 }
 
 template<class T>

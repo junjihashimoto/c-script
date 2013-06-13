@@ -54,6 +54,7 @@ struct Matrix{//Column Major
 
   */
   Matrix();
+  Matrix(int nr);
   Matrix(int nr,int nc);
   Matrix(int nr,int nc,T* d);
   Matrix(int nr,int nc,const Matrix& m,int nr_offset,int nc_offset);
@@ -75,9 +76,12 @@ struct Matrix{//Column Major
   void     read (FILE* in =stdin ,const char* format=NULL);
   int      nrow() const;
   int      ncol() const;
+  int      size() const;
 
   T&       operator()(int row,int col);
   const T& operator()(int row,int col)const;
+  T&       operator[](int i);      //for use as a vector 
+  const T& operator[](int i)const; //for use as a vector 
   Matrix<T>& operator=(const Matrix<T>& m);
   
   Pair<T>  operator<<(T v);
