@@ -4,14 +4,14 @@ double
 sigm(double v){
   return 1.0/(1.0+exp(-v));
 }
-const Matrix<double>&
+Matrix<double>
 h(const Matrix<double>& X){
   Matrix<double> a(X.nr,X.nc);
   mat_for(a)
     a(r,c)=sigm(X(r,c));
   return a;
 }
-const Matrix<double>&
+Matrix<double>
 hd(const Matrix<double>& X){
   Matrix<double> a(X.nr,X.nc);
   mat_for(a)
@@ -63,11 +63,13 @@ struct BP{
     ES	=new Matrix<double>[N];
     W	=new Matrix<double>[N];
     EW	=new Matrix<double>[N];
-    X [N].init(hier[N],1);
+    
+    X[N].init(hier[N],1);
+    
     for(int i=0;i<N;i++){
       X [i].init(hier[i],1);
-      S [i].init(hier[i],1);
-      ES[i].init(hier[i],1);
+      S [i].init(hier[i+1],1);
+      ES[i].init(hier[i+1],1);
       W [i].init(hier[i+1],hier[i]);
       EW[i].init(hier[i+1],hier[i]);
     }
@@ -105,7 +107,7 @@ struct BP{
 	ES[n]=x(X[n+1]-D,hd(S[n]));
 	EW[n]=ES[n]*t(X[n]);
       }else{
-	ES[n]=x(t(W[n])*ES[n+1],hd(S[n]));
+	ES[n]=x(t(W[n+1])*ES[n+1],hd(S[n]));
 	EW[n]=ES[n]*t(X[n]);
       }
     }
