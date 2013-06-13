@@ -209,7 +209,7 @@ Matrix<T>::operator[](int i){
 
 template<class T>
 const T&
-Matrix<T>::operator()(int i)const{
+Matrix<T>::operator[](int i)const{
   return dat[i];
 }
 

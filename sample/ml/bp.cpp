@@ -19,30 +19,59 @@ hd(const Matrix<double>& X){
   return a;
 }
 
-template<int N>
 struct BP{
-  Matrix<double> X[N+1];
-  Matrix<double> S[N];
-  Matrix<double> ES[N];
-  Matrix<double> W[N]; 
-  Matrix<double> EW[N];
-  vector<int>    heir;
+  int N;
+  Matrix<double>* X;//[N+1];
+  Matrix<double>* S;//[N];
+  Matrix<double>* ES;//[N];
+  Matrix<double>* W;//[N]; 
+  Matrix<double>* EW;//[N];
+  vector<int>     hier;
   double d;
   
   BP&
   operator <<(int i){
-    heir.push_back(i);
+    hier.clear();
+    hier.push_back(i);
     return *this;
   }
   BP&
   operator ,(int i){
-    heir.push_back(i);
+    hier.push_back(i);
     return *this;
+  }
+  BP(){
+    X	=NULL;
+    S	=NULL;
+    ES	=NULL;
+    W	=NULL;
+    EW	=NULL;
+    d   =0.01;
+  }
+  ~BP(){
+    delete[] X;
+    delete[] S;
+    delete[] ES;
+    delete[] W;
+    delete[] EW;
   }
   void
   init(){
+    N	=hier.size()-1;
+    X	=new Matrix<double>[N+1];
+    S	=new Matrix<double>[N];
+    ES	=new Matrix<double>[N];
+    W	=new Matrix<double>[N];
+    EW	=new Matrix<double>[N];
+    X [N].init(hier[N],1);
+    for(int i=0;i<N;i++){
+      X [i].init(hier[i],1);
+      S [i].init(hier[i],1);
+      ES[i].init(hier[i],1);
+      W [i].init(hier[i+1],hier[i]);
+      EW[i].init(hier[i+1],hier[i]);
+    }
   }
-
 
   //X[i+1]=sigm(S[i]=W[i]*X[i])
   //E/w1ij=E/S1i*S1i/w1ij
@@ -60,7 +89,7 @@ struct BP{
     X[0]=Y;
     for(int i=0;i<N;i++){
       S[i]=W[i]*X[i];
-      X[i+1]=h(S);
+      X[i+1]=h(S[i]);
     }
     return X[N];
   }
@@ -85,24 +114,33 @@ struct BP{
     }
   }
   void
-  update(const Matrix<double>& Y,
-	 const Matrix<double>& D
+  update(const Matrix<double>& IN,
+	 const Matrix<double>& EXP
 	 ){
-    forward(Y);
-    backward(D);
+    forward(IN);
+    backward(EXP);
   }
 };
 
+
 int
 main(){
-  BP<1>  bp;
+  BP bp;
   bp<<
-    4,
+    2,//input
+    2,//inernal
     1;//output
   bp.init();
-  for(int i=0;i<bp.heir.size();i++)
-    printf("%d\n",bp.heir[i]);
-  //  bp.update();
+  for(int i=0;i<bp.hier.size();i++)
+    printf("%d\n",bp.hier[i]);
+  for(int i=0;i<10000;i++){
+    Matrix<double> in(2);
+    Matrix<double> out(1);
+    in[0]=(double)(rand()%2);
+    in[1]=(double)(rand()%2);
+    out[0]=(double)((int)in[0]^(int)in[1]);
+    bp.update(in,out);    
+  }
   
   return 0;
 }
