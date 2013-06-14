@@ -311,6 +311,11 @@ Matrix<T>::operator /= (const Matrix<T>& b){
   not_implemented();
 }
 
+template<class T>
+Matrix<T>
+Matrix<T>::x(const Matrix<T>& b)const{
+  return ary_mul(*this,b);
+}
 
 template<class T>
 Matrix<T>
@@ -630,3 +635,20 @@ pca(const Matrix<T>& a,
   return 0;
 }
 
+template<class T,class Func>
+Matrix<T>
+MAP(const Matrix<T>& X,Func v){
+  Matrix<T> a(X.nr,X.nc);
+  mat_for(a)
+    a(r,c)=v(X(r,c));
+  return a;
+}
+
+template<class T,class Func>
+Matrix<T>
+FOLDR(const Matrix<T>& X,Func v,T initv){
+  T t=initv;
+  mat_for(X)
+    t+=X(r,c);
+  return t;
+}

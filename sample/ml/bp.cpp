@@ -4,19 +4,21 @@ double
 sigm(double v){
   return 1.0/(1.0+exp(-v));
 }
+
+double
+sigmd(double v){
+  return sigm(v)*(1.0-sigm(v));
+}
+
+
 Matrix<double>
 h(const Matrix<double>& X){
-  Matrix<double> a(X.nr,X.nc);
-  mat_for(a)
-    a(r,c)=sigm(X(r,c));
-  return a;
+  return MAP(X,sigm);
 }
+
 Matrix<double>
 hd(const Matrix<double>& X){
-  Matrix<double> a(X.nr,X.nc);
-  mat_for(a)
-    a(r,c)=sigm(X(r,c))*(1.0-sigm(X(r,c)));
-  return a;
+  return MAP(X,sigmd);
 }
 
 struct BP{
@@ -130,7 +132,10 @@ main(){
   BP bp;
   bp<<
     2,//input
-    2,//inernal
+    10,//inernal
+    9,//inernal
+    8,//inernal
+    7,//inernal
     1;//output
   bp.init();
   for(int i=0;i<bp.hier.size();i++)
@@ -143,6 +148,7 @@ main(){
     out[0]=(double)((int)in[0]^(int)in[1]);
     bp.update(in,out);    
   }
+
   
   return 0;
 }

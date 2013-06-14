@@ -94,6 +94,9 @@ struct Matrix{//Column Major
   Matrix<T>& operator *= (T b);
   Matrix<T>& operator /= (T b);
   Matrix<T>& operator /= (const Matrix<T>& b);
+
+  Matrix<T>  x(const Matrix<T>& m)const;
+
 };
 
 template<class T> Matrix<T> operator + (const Matrix<T>& a,const Matrix<T>& b);
@@ -111,6 +114,7 @@ template<class T> Matrix<T> eye        (int nr,int nc);
 template<class T> Matrix<T> zero       (int nr,int nc);
 template<class T> Matrix<T> one        (int nr,int nc);
 template<class T> Matrix<T> ary_mul    (const Matrix<T>& a,const Matrix<T>& b);
+template<class T> Matrix<T> x          (const Matrix<T>& a,const Matrix<T>& b);
 template<class T> Matrix<T> ary_div    (const Matrix<T>& a,const Matrix<T>& b);
 template<class T> bool      operator ==(const Matrix<T>& a,const Matrix<T>& b);
 template<class T> bool      operator !=(const Matrix<T>& a,const Matrix<T>& b);
@@ -143,6 +147,11 @@ template<class T> Matrix<T> solve_yacobi(const Matrix<T>& a,
 template<class T> int pca(const Matrix<T>& a,
 			  Matrix<T>& eigen_value,
 			  Matrix<T>& eigen_vec);
+
+
+template<class T,class Func> Matrix<T> MAP(const Matrix<T>& X,Func v);
+template<class T,class Func> Matrix<T> FOLDR(const Matrix<T>& X,Func v,T initv);
+
 
 #define solve(a,b) solve_gels(a,b)
 
