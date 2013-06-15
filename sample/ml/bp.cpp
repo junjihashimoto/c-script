@@ -104,14 +104,13 @@ struct BP{
     //E/Wnij=sumj(E/Sn1j*Wn1ji)*hd(Sni)*X3j
     //E/Sn1i =(Xn1i-Dn1i)*hd(Sn1i);
     //E/Sni =sumj(E/Sn1j*Wn1ji)*hd(Sni);
+    
     for(int n=N-1;n>=0;n--){
-      if(n==N-1){
+      if(n==N-1)
 	ES[n]=x(X[n+1]-D,hd(S[n]));
-	EW[n]=ES[n]*t(X[n]);
-      }else{
+      else
 	ES[n]=x(t(W[n+1])*ES[n+1],hd(S[n]));
-	EW[n]=ES[n]*t(X[n]);
-      }
+      EW[n]=ES[n]*t(X[n]);
     }
     for(int n=N-1;n>=0;n--){
       W[n]+=EW[n]*d;
