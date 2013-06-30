@@ -16,6 +16,7 @@ our $dependent_src;
 our $sys_src;
 our $run_dir;
 our $exp;
+our $source_filter=sub{$_[0]};
 
 our $cc;
 our $debug_opt;
@@ -410,13 +411,13 @@ sub gen_src{
     
 
     
-    $code.=gen_src_str($default_header,0);
+    $code.=$source_filter->(gen_src_str($default_header,0));
     
     $code.="int main(int argc,char** argv){\n" if($nomain);
     
     $code.="#line 1  \"$main_src\"\n";
     
-    $code.=gen_src_str(file2str($main_src),1);
+    $code.=$source_filter->(gen_src_str(file2str($main_src),1));
     
     $code.="  return 0;\n}\n" if($nomain);
     open OUT,">$mod_main_src";

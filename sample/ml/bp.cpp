@@ -131,10 +131,10 @@ main(){
   BP bp;
   bp<<
     2,//input
-    10,//inernal
-    9,//inernal
-    8,//inernal
-    7,//inernal
+    256*256,//inernal
+    16*16,//inernal
+    4*4,//inernal
+    2*2,//inernal
     1;//output
   bp.init();
   for(int i=0;i<bp.hier.size();i++)
@@ -145,7 +145,8 @@ main(){
     in[0]=(double)(rand()%2);
     in[1]=(double)(rand()%2);
     out[0]=(double)((int)in[0]^(int)in[1]);
-    bp.update(in,out);    
+    bp.update(in,out);
+    printf("%d\n",i);
   }
 
   

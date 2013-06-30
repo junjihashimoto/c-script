@@ -20,4 +20,3 @@ if($mingw32){
     $libs="$script_home/libs/thread/linux/libthread.a ".$libs;
 }
 #pragma c-script:eval_end
-
