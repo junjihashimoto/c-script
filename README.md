@@ -19,7 +19,8 @@ This supports following functions.
 6. Matrix function like eigen: This uses blas and lapack.
 7. Drawing graph funtion by gnuplot
 8. c++, cuda, c, obj-c and c# are supported.
-9. package system (new!)
+9. package system
+10. source filter (2013/7/1 New!)
 
 Install
 -------
@@ -63,10 +64,10 @@ Usage: c-script [options] script-file [script-options]
     -syntax       use '-fsyntax-only' option for gcc
     -no_chk_main  disable of main-function-insertion
     -nocache      compile the program everytime
-    -d            run the program under the gdb
-    -gdb          run the program under the gdb
-    -ddd          run the program under the ddd
-    -vc           run the program under the visual studio
+    -d            run this program under gdb
+    -gdb          run this program under gdb
+    -ddd          run this program under ddd
+    -vc           run this program under visual studio
     -show         output code after preprocess
     -cmd          output compiler-options
     -depend       output dependent files
@@ -108,7 +109,7 @@ Compilation and execution flow
 
 This runs following steps.
 
-1. Read initialization script for reading compilation paramater.
-2. Generate compiled code (For example, header like '#include' is added.)
-3. Compile 
+1. Read initialization script for reading compilation paramater.(For example, gcc-optimization-parameter(-O4))
+2. Generate C++/C#-etc source code (For example, header like '#include' is added automatically.)
+3. Compile by GCC
 4. Run complied binary
