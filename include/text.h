@@ -17,6 +17,8 @@ struct Data{
   Data&    operator =  (const Data& b);
   T&       operator [] (int k);
   const T& operator [] (int k)const;
+  int     read(const char* file);
+  int     write(const char* file)const;
 };
 
 typedef Data<char> DATA;
@@ -123,6 +125,41 @@ const T&
 Data<T>::operator [] (int k)const{
   return dat[k];
 }
+
+template<class T>
+int
+Data<T>::read(const char* file){
+  FILE* f=fopen(file,"rb");
+  if(f!=NULL){
+    T buf[1024];
+    int i;
+    while(i=fread(buf,sizeof(T),1024,f))
+      push_back(buf,i);
+    fclose(f);
+    return 1;
+  }
+  return 0;
+}
+
+template<class T>
+int
+Data<T>::write(const char* file)const{
+  FILE* f=fopen(file,"wb");
+  if(f!=NULL){
+    T*  p=dat;
+    int l=len;
+    int i;
+    do{
+      i=fread(p,sizeof(T),l,f);
+      p+=i;
+      l-=i;
+    }while(l>0);
+    fclose(f);
+    return 1;
+  }
+  return 0;
+}
+
 
 template<class T>
 vector<T>

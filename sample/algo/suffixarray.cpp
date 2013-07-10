@@ -14,9 +14,18 @@ struct SuffixArray{
   Data<int>  ptr;
   
   void mkIndex(){
-    ptr.init(dat.len);
-    for(int i=0;i<dat.len;i++)
-      ptr.push_back(i);
+    // ptr.init(dat.len);
+    // for(int i=0;i<dat.len;i++)
+    //   ptr.push_back(i);
+    data_for(dat){
+      //      printf("%d\n",(int)dat[i]);
+      if(dat[i]=='\n')
+	dat[i]=0;
+      if(dat[i]!=0   &&
+	 dat[i]!='\n'&&
+	 dat[i]!=' ')
+	ptr.push_back(i);
+    }
     sort(ptr.dat,ptr.dat+ptr.len,Less(dat));
   }
   void print(){
@@ -65,8 +74,8 @@ struct SuffixArray{
   }
   void search(const char* key){
     int len=strlen(key);
-    int n=search(key,len,0,dat.len,1);
-    int p=search(key,len,0,dat.len,0);
+    int n=search(key,len,0,ptr.len,1);
+    int p=search(key,len,0,ptr.len,0);
     printf("%d\n",n);
     printf("%d\n",p);
   }
@@ -74,17 +83,26 @@ struct SuffixArray{
 
 int
 main(){
-  SuffixArray sa;
-  char str[]="abrakatabra";
-  sa.dat.push_back(str,sizeof(str));
-  sa.mkIndex();
-  sa.print();
-  sa.search("bra");
-  sa.search("ab");
-  sa.search("atab");
-  sa.search("bbbb");
-  sa.search("tab");
-  sa.search("zzz");
+  {
+    SuffixArray sa;
+    char str[]="abrakatabra\n\n\nabrakatabra";
+    sa.dat.push_back(str,sizeof(str));
+    sa.mkIndex();
+    sa.print();
+    sa.search("bra");
+    sa.search("ab");
+    sa.search("atab");
+    sa.search("bbbb");
+    sa.search("tab");
+    sa.search("zzz");
+  }
+  //  return 0;
+  {
+    SuffixArray sa;
+    sa.dat.read("docs/dat.txt");
+    sa.mkIndex();
+    sa.print();
+  }
   
   return 0;
 }
