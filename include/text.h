@@ -21,6 +21,8 @@ struct Data{
 
 typedef Data<char> DATA;
 
+#define data_for(data) for(int i=0;i<data.len;i++)
+
 template<class T> vector<T> split(const T& str,const char* delim);
 template<class T> T*        get_line(FILE* in,Data<T>& dat);
 
