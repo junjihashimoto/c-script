@@ -12,17 +12,16 @@ struct Less{
 struct SuffixArray{
   Data<char> dat;
   Data<int>  ptr;
+
   
   void mkIndex(){
-    // ptr.init(dat.len);
-    // for(int i=0;i<dat.len;i++)
-    //   ptr.push_back(i);
     data_for(dat){
-      //      printf("%d\n",(int)dat[i]);
       if(dat[i]=='\n')
 	dat[i]=0;
       if(dat[i]!=0   &&
 	 dat[i]!='\n'&&
+	 dat[i]!='\r'&&
+	 dat[i]!='\t'&&
 	 dat[i]!=' ')
 	ptr.push_back(i);
     }
@@ -30,7 +29,7 @@ struct SuffixArray{
   }
   void print(){
     data_for(ptr)
-      printf("%2d:%2d:%s\n",i,ptr[i],dat.dat+ptr[i]);
+      printf("%2d:%2d:'%s'\n",i,ptr[i],dat.dat+ptr[i]);
   }
   const char* str(int i){
     return dat.dat+ptr[i];
@@ -101,7 +100,11 @@ main(){
     SuffixArray sa;
     sa.dat.read("docs/dat.txt");
     sa.mkIndex();
-    sa.print();
+    sa.search("href");
+    char buf[1024];
+    while(gets(buf)){
+      sa.search(buf);
+    }
   }
   
   return 0;
