@@ -150,7 +150,7 @@ Data<T>::write(const char* file)const{
     int l=len;
     int i;
     do{
-      i=fread(p,sizeof(T),l,f);
+      i=fwrite(p,sizeof(T),l,f);
       p+=i;
       l-=i;
     }while(l>0);

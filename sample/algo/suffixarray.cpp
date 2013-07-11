@@ -1,6 +1,16 @@
 #!/usr/bin/env c-script
 #include <algorithm>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int
+_e(const char* file){
+  struct stat buf;
+  return stat(file, &buf)==0 ? 1: 0;
+}
+
 struct Less{
   const Data<char>& dat;
   Less(const Data<char>& p):dat(p){}
@@ -71,18 +81,30 @@ struct SuffixArray{
     goto SEARCH;
       
   }
-  void search(const char* key){
+  int search(const char* key,int& head){
     int len=strlen(key);
     int n=search(key,len,0,ptr.len,1);
     int p=search(key,len,0,ptr.len,0);
-    printf("%d\n",n);
-    printf("%d\n",p);
+    //    printf("%d\n",n);
+    //    printf("%d\n",p);
+    if(n<0){
+      head=-1;
+      return 0;
+    }
+    head=n;
+    return p-n+1;
+  }
+  void
+  search(const char* key){
+    int head;
+    int n=search(key,head);
+    printf("%s,%d,%d\n",key,n,head);
   }
 };
 
 int
 main(){
-  {
+  if(0){
     SuffixArray sa;
     char str[]="abrakatabra\n\n\nabrakatabra";
     sa.dat.push_back(str,sizeof(str));
@@ -99,7 +121,12 @@ main(){
   {
     SuffixArray sa;
     sa.dat.read("docs/dat.txt");
-    sa.mkIndex();
+    if(!_e("docs/ptr.bin")){
+      sa.mkIndex();
+      sa.ptr.write("docs/ptr.bin");
+    }else
+      sa.ptr.read("docs/ptr.bin");
+      
     sa.search("href");
     char buf[1024];
     while(gets(buf)){
