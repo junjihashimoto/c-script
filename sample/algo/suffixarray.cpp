@@ -19,9 +19,21 @@ struct Less{
   }
 };
 
+
 struct SuffixArray{
-  Data<char> dat;
-  Data<int>  ptr;
+  Data<char>  dat;
+  Data<int>   ptr;
+  
+  Data<int>   fileptr;
+  Data<char>  filenames;
+
+  void
+  setFile(const char* file){
+    int p=dat.len;
+    fileptr.push_back(p);
+    filenames.push_back(file,strlen(file)+1);
+    dat.read(file);
+  }
 
   
   void mkIndex(){
