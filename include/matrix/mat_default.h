@@ -1,5 +1,16 @@
 #include "mat.h"
 
+//#define DEBUG_MATRIX
+#ifdef DEBUG_MATRIX
+#define MALLOC(a)     malloc(a);printf("malloc:%d\n",(int)(a))
+#define MEMCPY(a,b,c) memcpy(a,b,c);printf("memcpy:%d\n",(int)(c))
+#define FREE(a)       free(a);printf("free\n")
+#else
+#define MALLOC(a)     malloc(a)
+#define MEMCPY(a,b,c) memcpy(a,b,c)
+#define FREE(a)       free(a)
+#endif
+
 template<class T>
 Matrix<T>::Matrix(){
   dat=NULL;
@@ -20,7 +31,7 @@ Matrix<T>::Matrix(int nr,int nc){
 template<class T>
 Matrix<T>::Matrix(int nr,int nc,T* d){
   init(nr,nc);
-  memcpy(dat,d,sizeof(T)*nc*nr);
+  MEMCPY(dat,d,sizeof(T)*nc*nr);
 }
 
 template<class T>
@@ -35,13 +46,13 @@ Matrix<T>::Matrix(int nr,int nc,const Matrix& m,int r_offset,int c_offset){
 template<class T>
 Matrix<T>::Matrix(const Matrix& m){
   init(m.nr,m.nc);
-  memcpy(dat,m.dat,sizeof(T)*nc*nr);
+  MEMCPY(dat,m.dat,sizeof(T)*nc*nr);
 }
 
 template<class T>
 Matrix<T>::~Matrix(){
   if(dat!=NULL)
-    free(dat);
+    FREE(dat);
   dat=NULL;
 }
 
@@ -51,7 +62,7 @@ void
 Matrix<T>::init(int nr,int nc){
   this->nr=nr;
   this->nc=nc;
-  dat=(T*)malloc(nr*nc*sizeof(T));
+  dat=(T*)MALLOC(nr*nc*sizeof(T));
 }
 
 
@@ -71,7 +82,7 @@ Matrix<T>::col(int c){
 template<class T>
 void
 Matrix<T>::set(const T* ary){
-  memcpy(dat,ary,sizeof(T)*nc*nr);
+  MEMCPY(dat,ary,sizeof(T)*nc*nr);
 }
 
 template<class T>
@@ -84,7 +95,7 @@ Matrix<T>::set_row(int row,const T* ary){
 template<class T>
 void
 Matrix<T>::set_col(int col,const T* ary){
-  memcpy(dat+col*nr,ary,sizeof(T)*col);
+  MEMCPY(dat+col*nr,ary,sizeof(T)*col);
 }
 
 template<class T>
@@ -215,17 +226,17 @@ Matrix<T>::operator[](int i)const{
 
 template<class T>
 Matrix<T>&
-Matrix<T>::operator=(const Matrix& m){
+Matrix<T>::operator=(Matrix m){
   if(dat!=NULL){
-    free(dat);
+    FREE(dat);
     dat=NULL;
   }
     
   nr=m.nr;
   nc=m.nc;
-  dat=(T*)malloc(nr*nc*sizeof(T));
+  dat=m.dat;
+  m.dat=NULL;
 
-  memcpy(dat,m.dat,sizeof(T)*nc*nr);
   return *this;
 }
   
@@ -319,36 +330,44 @@ Matrix<T>::x(const Matrix<T>& b)const{
 
 template<class T>
 Matrix<T>
-operator + (const Matrix<T>& a,const Matrix<T>& b){
-  Matrix<T> c=a;
-  return (c+=b);
+operator + (Matrix<T> a,const Matrix<T>& b){
+  Matrix<T> c;
+  a+=b;
+  c.swap(a);
+  return c;
 }
 
 template<class T>
-Matrix<T> operator + (const Matrix<T>& a,T b){
-  Matrix<T> c=a;
-  return (c+=b);
+Matrix<T> operator + (Matrix<T> a,T b){
+  Matrix<T> c;
+  a+=b;
+  c.swap(a);
+  return c;
 }
 
 template<class T>
-Matrix<T> operator - (const Matrix<T>& a,const Matrix<T>& b){
-  Matrix<T> c=a;
-  return (c-=b);
+Matrix<T> operator - (Matrix<T> a,const Matrix<T>& b){
+  Matrix<T> c;
+  a-=b;
+  c.swap(a);
+  return c;
 }
 
 template<class T>
-Matrix<T> operator - (const Matrix<T>& a,T b){
-  Matrix<T> c=a;
-  return (c-=b);
+Matrix<T> operator - (Matrix<T> a,T b){
+  Matrix<T> c;
+  a-=b;
+  c.swap(a);
+  return c;
 }
 
 
 template<class T>
-Matrix<T> operator - (const Matrix<T>& a){
-  Matrix<T> c=a;
+Matrix<T> operator - (Matrix<T> a){
+  Matrix<T> c;
   for(int j=0;j<c.nc;j++)
     for(int i=0;i<c.nr;i++)
-      c(i,j)=-c(i,j);
+      c(i,j)=-a(i,j);
   return c;
 }
 
@@ -368,15 +387,19 @@ Matrix<T> operator * (const Matrix<T>& a,const Matrix<T>& b){
 
 
 template<class T>
-Matrix<T> operator * (const Matrix<T>& a,T b){
-  Matrix<T> c=a;
-  return (c*=b);
+Matrix<T> operator * (Matrix<T> a,T b){
+  Matrix<T> c;
+  a*=b;
+  c.swap(a);
+  return c;
 }
 
 template<class T>
-Matrix<T> operator / (const Matrix<T>& a,T b){
-  Matrix<T> c=a;
-  return (c/=b);
+Matrix<T> operator / (Matrix<T> a,T b){
+  Matrix<T> c;
+  a/=b;
+  c.swap(a);
+  return c;
 }
 
 template<class T>
@@ -415,25 +438,32 @@ one       (int nr,int nc){
 
 
 template<class T>
-Matrix<T> ary_mul    (const Matrix<T>& a,const Matrix<T>& b){
-  Matrix<T> c=a;
+Matrix<T> ary_mul  (Matrix<T> a,const Matrix<T>& b){
+  Matrix<T> c;
   for(int k=0;k<a.nc;k++)
     for(int i=0;i<a.nr;i++)
-      c(i,k)*=b(i,k);
+      a(i,k)*=b(i,k);
+  c.swap(a);
   return c;
 }
 
 template<class T>
-Matrix<T> x(const Matrix<T>& a,const Matrix<T>& b){
-  return ary_mul(a,b);
+Matrix<T> x(Matrix<T> a,const Matrix<T>& b){
+  Matrix<T> c;
+  for(int k=0;k<a.nc;k++)
+    for(int i=0;i<a.nr;i++)
+      a(i,k)*=b(i,k);
+  c.swap(a);
+  return c;
 }
 
 template<class T>
-Matrix<T> ary_div    (const Matrix<T>& a,const Matrix<T>& b){
-  Matrix<T> c=a;
+Matrix<T> ary_div    (Matrix<T> a,const Matrix<T>& b){
+  Matrix<T> c;
   for(int k=0;k<a.nc;k++)
     for(int i=0;i<a.nr;i++)
-      c(i,k)/=b(i,k);
+      a(i,k)/=b(i,k);
+  c.swap(a);
   return c;
 }
 

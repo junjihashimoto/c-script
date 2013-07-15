@@ -3,7 +3,7 @@ template<> Matrix<float>&  Matrix<float>::operator += (const Matrix<float>& b);
 template<> Matrix<float>&  Matrix<float>::operator -= (const Matrix<float>& b);
 template<> Matrix<float>&  Matrix<float>::operator *= (float b);
 template<> Matrix<float>&  Matrix<float>::operator /= (float b);
-template<> Matrix<float> operator - (const Matrix<float>& a);
+template<> Matrix<float> operator - (Matrix<float> a);
 template<> Matrix<float> operator * (const Matrix<float>& a,const Matrix<float>& b);
 template<> float nrm2(const Matrix<float>& a);
 template<> float dot(const Matrix<float>& a,const Matrix<float>& b);

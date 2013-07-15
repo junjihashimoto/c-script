@@ -9,6 +9,7 @@
 #include <string>
 using namespace std;
 
+
 #define not_implemented() {printf("Not implemented:%s\n",__func__);exit(1);}
 #define MIN(x,y) ((x)<=(y) ? (x) : (y))
 #define MAX(x,y) ((x)>=(y) ? (x) : (y))
@@ -82,7 +83,7 @@ struct Matrix{//Column Major
   const T& operator()(int row,int col)const;
   T&       operator[](int i);      //for use as a vector 
   const T& operator[](int i)const; //for use as a vector 
-  Matrix<T>& operator=(const Matrix<T>& m);
+  Matrix<T>& operator=(Matrix<T> m);
   
   Pair<T>  operator<<(T v);
   
@@ -99,23 +100,23 @@ struct Matrix{//Column Major
 
 };
 
-template<class T> Matrix<T> operator + (const Matrix<T>& a,const Matrix<T>& b);
-template<class T> Matrix<T> operator + (const Matrix<T>& a,T b);
-template<class T> Matrix<T> operator - (const Matrix<T>& a,const Matrix<T>& b);
-template<class T> Matrix<T> operator - (const Matrix<T>& a,T b);
-template<class T> Matrix<T> operator - (const Matrix<T>& a);
+template<class T> Matrix<T> operator + (Matrix<T> a,const Matrix<T>& b);
+template<class T> Matrix<T> operator + (Matrix<T> a,T b);
+template<class T> Matrix<T> operator - (Matrix<T> a,const Matrix<T>& b);
+template<class T> Matrix<T> operator - (Matrix<T> a,T b);
+template<class T> Matrix<T> operator - (Matrix<T> a);
 template<class T> Matrix<T> operator * (const Matrix<T>& a,const Matrix<T>& b);
-template<class T> Matrix<T> operator * (const Matrix<T>& a,T b);
-template<class T> Matrix<T> operator / (const Matrix<T>& a,T b);
+template<class T> Matrix<T> operator * (Matrix<T> a,T b);
+template<class T> Matrix<T> operator / (Matrix<T> a,T b);
 template<class T> Matrix<T> operator / (const Matrix<T>& a,const Matrix<T>& b);
 
 
 template<class T> Matrix<T> eye        (int nr,int nc);
 template<class T> Matrix<T> zero       (int nr,int nc);
 template<class T> Matrix<T> one        (int nr,int nc);
-template<class T> Matrix<T> ary_mul    (const Matrix<T>& a,const Matrix<T>& b);
-template<class T> Matrix<T> x          (const Matrix<T>& a,const Matrix<T>& b);
-template<class T> Matrix<T> ary_div    (const Matrix<T>& a,const Matrix<T>& b);
+template<class T> Matrix<T> ary_mul    (Matrix<T> a,const Matrix<T>& b);
+template<class T> Matrix<T> x          (Matrix<T> a,const Matrix<T>& b);
+template<class T> Matrix<T> ary_div    (Matrix<T> a,const Matrix<T>& b);
 template<class T> bool      operator ==(const Matrix<T>& a,const Matrix<T>& b);
 template<class T> bool      operator !=(const Matrix<T>& a,const Matrix<T>& b);
 template<class T> Matrix<T> operator ^ (const Matrix<T>& a,int v);

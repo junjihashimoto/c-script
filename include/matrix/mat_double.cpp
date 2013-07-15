@@ -109,16 +109,17 @@ Matrix<double>::operator /= (double b){
 }
 
 template<>
-Matrix<double> operator - (const Matrix<double>& a){
-  Matrix<double> c=a;
+Matrix<double> operator - (Matrix<double> a){
+  Matrix<double> c;
   double alpha=-1.0;
   int n=a.nrow()*a.ncol();
   int s=1;
   //a=ax
   dscal_(&n,
 	 &alpha,
-	 c.dat,
+	 a.dat,
 	 &s);
+  c.swap(a);
   return c;
 }
 

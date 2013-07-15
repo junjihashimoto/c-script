@@ -55,17 +55,17 @@ struct SVM{
     YY=Y*t(Y);
   }
   double cost(){
-    return sum(L)-0.5*sum(ary_mul(ary_mul(XX,YY),LL));
+    return sum(L)-0.5*sum(x(x(XX,YY),LL));
   }
   void update(double d,double C){
     LL=L*t(L);
-    L+=(ones-ary_mul(XX,YY)*L-YY*L*C)*d;
+    L+=(ones-x(XX,YY)*L-YY*L*C)*d;
     mat_for(L){
       if(L(r,c)<0)
 	L(r,c)=0;
     }
-    w=t(X)*ary_mul(L,Y);
-    b=sum(ary_mul(X*w,L)/sum(L));
+    w=t(X)*x(L,Y);
+    b=sum(x(X*w,L))/sum(L);
   }
 };
 

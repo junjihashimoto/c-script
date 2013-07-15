@@ -110,16 +110,17 @@ Matrix<float>::operator /= (float b){
 }
 
 template<>
-Matrix<float> operator - (const Matrix<float>& a){
-  Matrix<float> c=a;
+Matrix<float> operator - (Matrix<float> a){
+  Matrix<float> c;
   float alpha=-1.0;
   int n=a.nrow()*a.ncol();
   int s=1;
   //a=ax
   sscal_(&n,
 	 &alpha,
-	 c.dat,
+	 a.dat,
 	 &s);
+  c.swap(a);
   return c;
 }
 
