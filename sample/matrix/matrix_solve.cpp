@@ -1,5 +1,9 @@
 #!/usr/bin/env c-script
 
+#pragma c-script:eval_begin
+$default_header="#define DEBUG_MATRIX\n".$default_header;
+#pragma c-script:eval_end
+
 template<class T>
 int
 test(){
