@@ -150,7 +150,7 @@ template<class T> int pca(const Matrix<T>& a,
 			  Matrix<T>& eigen_vec);
 
 
-template<class T,class Func> Matrix<T> MAP(const Matrix<T>& X,Func v);
+template<class T,class Func> Matrix<T> MAP(Matrix<T> X,Func v);
 template<class T,class Func> Matrix<T> FOLDR(const Matrix<T>& X,Func v,T initv);
 
 

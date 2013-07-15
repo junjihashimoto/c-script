@@ -12,13 +12,15 @@ sigmd(double v){
 
 
 Matrix<double>
-h(const Matrix<double>& X){
-  return MAP(X,sigm);
+h(Matrix<double> X){
+  Matrix<double> a=MAP(X,sigm);
+  return a;
 }
 
 Matrix<double>
-hd(const Matrix<double>& X){
-  return MAP(X,sigmd);
+hd(Matrix<double> X){
+  Matrix<double> a=MAP(X,sigmd);
+  return a;
 }
 
 struct BP{
@@ -110,10 +112,11 @@ struct BP{
 	ES[n]=x(X[n+1]-D,hd(S[n]));
       else
 	ES[n]=x(t(W[n+1])*ES[n+1],hd(S[n]));
-      EW[n]=ES[n]*t(X[n]);
+      //      EW[n]=ES[n]*t(X[n]);
     }
     for(int n=N-1;n>=0;n--){
-      W[n]+=EW[n]*d;
+      //      W[n]+=EW[n]*d;
+      W[n]+=ES[n]*t(X[n])*d;
     }
   }
   void

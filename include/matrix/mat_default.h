@@ -667,10 +667,11 @@ pca(const Matrix<T>& a,
 
 template<class T,class Func>
 Matrix<T>
-MAP(const Matrix<T>& X,Func v){
-  Matrix<T> a(X.nr,X.nc);
-  mat_for(a)
-    a(r,c)=v(X(r,c));
+MAP(Matrix<T> X,Func v){
+  Matrix<T> a;
+  mat_for(X)
+    X(r,c)=v(X(r,c));
+  a.swap(X);
   return a;
 }
 
