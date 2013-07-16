@@ -124,6 +124,31 @@ Matrix<double> operator - (Matrix<double> a){
 }
 
 template<>
+Matrix<double> operator + (Matrix<double> a,const Matrix<double>& b){
+  Matrix<double> c;
+  double alpha=1.0;
+  double beta=0;
+  int incx=1;
+  int n=a.nc*a.nr;
+  daxpy_(&n,&alpha,b.dat,&incx,a.dat,&incx);
+  c.swap(a);
+
+  return c;
+}
+template<>
+Matrix<double> operator - (Matrix<double> a,const Matrix<double>& b){
+  Matrix<double> c;
+  double alpha=-1.0;
+  double beta=0;
+  int incx=1;
+  int n=a.nc*a.nr;
+  daxpy_(&n,&alpha,b.dat,&incx,a.dat,&incx);
+  c.swap(a);
+
+  return c;
+}
+
+template<>
 Matrix<double> operator * (const Matrix<double>& a,const Matrix<double>& b){
   Matrix<double> c(a.nrow(),b.ncol());
   double alpha=1.0;

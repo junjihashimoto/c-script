@@ -509,10 +509,27 @@ nrm2(const Matrix<T>& a){
 
 template<class T>
 Matrix<T>
-t(const Matrix<T>& a){// return At
-  Matrix<T> cc(a.ncol(),a.nrow());
-  mat_for(cc)
-    cc(r,c)=a(c,r);
+t(Matrix<T> a){// return At
+  Matrix<T> cc;
+  if(a.nr==1||a.nc==1){
+    int tmp=a.nr;
+    a.nr=a.nc;
+    a.nc=tmp;
+    cc.swap(a);
+  }else if(a.nr==a.nc){
+    for(int c=0;c<a.nc;c++){
+      for(int r=c+1;r<a.nr;r++){
+	int tmp=a(c,r);
+	a(c,r)=a(r,c);
+	a(r,c)=tmp;
+      }
+    }
+    cc.swap(a);
+  }else{
+    cc.init(a.ncol(),a.nrow());
+    mat_for(cc)
+      cc(r,c)=a(c,r);
+  }
   return cc;
 }
 

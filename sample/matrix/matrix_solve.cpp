@@ -24,6 +24,9 @@ test(){
   d3=d;
   printf("+\n");
   d3=d+d2;
+  d3.write();
+  d3=d-d2;
+  d3.write();
   printf("=\n");
   Matrix<T> d5=d;
   printf("+=\n");

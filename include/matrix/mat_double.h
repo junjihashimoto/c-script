@@ -4,6 +4,8 @@ template<> Matrix<double>&  Matrix<double>::operator -= (const Matrix<double>& b
 template<> Matrix<double>&  Matrix<double>::operator *= (double b);
 template<> Matrix<double>&  Matrix<double>::operator /= (double b);
 template<> Matrix<double> operator - (Matrix<double> a);
+template<> Matrix<double> operator + (Matrix<double> a,const Matrix<double>& b);
+template<> Matrix<double> operator - (Matrix<double> a,const Matrix<double>& b);
 template<> Matrix<double> operator * (const Matrix<double>& a,const Matrix<double>& b);
 template<> double nrm2(const Matrix<double>& a);
 template<> double dot(const Matrix<double>& a,const Matrix<double>& b);

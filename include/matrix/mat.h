@@ -122,7 +122,7 @@ template<class T> bool      operator !=(const Matrix<T>& a,const Matrix<T>& b);
 template<class T> Matrix<T> operator ^ (const Matrix<T>& a,int v);
 template<class T> Matrix<T> inv        (const Matrix<T>& a);
 template<class T> T         nrm2       (const Matrix<T>& a);
-template<class T> Matrix<T> t          (const Matrix<T>& a);// return At
+template<class T> Matrix<T> t          (Matrix<T> a);// return At
 template<class T> T         dot        (const Matrix<T>& a,const Matrix<T>& b);
 template<class T> T         ave        (const Matrix<T>& a);
 template<class T> Matrix<T> ave_row    (const Matrix<T>& a);

@@ -124,6 +124,31 @@ Matrix<float> operator - (Matrix<float> a){
   return c;
 }
 
+template<>
+Matrix<float> operator + (Matrix<float> a,const Matrix<float>& b){
+  Matrix<float> c;
+  float alpha=1.0;
+  float beta=0;
+  int incx=1;
+  int n=a.nc*a.nr;
+  saxpy_(&n,&alpha,b.dat,&incx,a.dat,&incx);
+  c.swap(a);
+
+  return c;
+}
+template<>
+Matrix<float> operator - (Matrix<float> a,const Matrix<float>& b){
+  Matrix<float> c;
+  float alpha=-1.0;
+  float beta=0;
+  int incx=1;
+  int n=a.nc*a.nr;
+  saxpy_(&n,&alpha,b.dat,&incx,a.dat,&incx);
+  c.swap(a);
+
+  return c;
+}
+
 
 
 template<>
