@@ -107,6 +107,7 @@ sub get_cmd_options{
 	    exit;
 	}elsif ( $op eq "-o"){
 	    shift @ARGV;
+	    $no_cache     =1;
 	    $output_binary=shift @ARGV;
 	    next;
 	}elsif ( $op eq "-mingw32"){
@@ -656,7 +657,7 @@ if($syntax || $no_cache || compilep($exe,$main_src,$other_src,$inc)){
     compile();
 }
 
-if($syntax||$output_binary){
+if($syntax || $output_binary){
     exit 0;
 }
     
