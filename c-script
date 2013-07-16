@@ -35,6 +35,7 @@ our $syntax;
 
 our $gdb;
 our $ddd;
+our $prof;
 
 our $mingw32;
 our $static;
@@ -70,11 +71,12 @@ Usage: c-script [options] script-file [script-options]
     -syntax       use '-fsyntax-only' option for gcc
     -no_chk_main  disable of main-function-insertion
     -nocache      compile the program everytime
-    -d            run the program under the gdb
-    -dargs        run the program under the gdb with --args
-    -gdb          run the program under the gdb
-    -ddd          run the program under the ddd
-    -vc           run the program under the visual studio
+    -d            run the program under gdb
+    -dargs        run the program under gdb with --args
+    -gdb          run the program under gdb
+    -ddd          run the program under ddd
+    -vc           run the program under visual studio
+    -pg           run the program with -pg
     -show         output code after preprocess
     -cmd          output compiler-options
     -depend       output dependent files
@@ -154,6 +156,11 @@ sub get_cmd_options{
 	    $debug="vc";
 	    shift @ARGV;
 	    last;
+	}elsif ( $op eq "-pg"){
+	    $no_cache=1;
+	    $prof="gprof";
+	    shift @ARGV;
+	    next;
 	}elsif ( $op eq "-show"){
 	    $show_code=1;
 	    shift @ARGV;
@@ -167,8 +174,9 @@ sub get_cmd_options{
 	    shift @ARGV;
 	    next;
 	}elsif ( $op eq "-clean"){
-	    $clean=1;
+	    clean();
 	    shift @ARGV;
+	    exit if($#ARGV == -1);
 	    next;
 	}elsif (-e $op ){
 	    last;
@@ -188,13 +196,14 @@ sub init{
 
 }
 
-sub setup{
-    if($clean){
-	my $h=$home."/cache";
-	for(glob $h."/*"){
-	    unlink $_;
-	}
+sub clean{
+    my $h=$home."/cache";
+    for(glob $h."/*"){
+	unlink $_;
     }
+}
+
+sub setup{
 
     if($exp){
 	unshift @ARGV,set_exp_file($exp);
@@ -272,8 +281,12 @@ sub load_init_pl{
 	$opt=$normal_opt.' '.$opt;
     }
     
+    if($prof eq "gprof"){
+	$opt.=' -pg';
+    }
+    
     if($syntax){
-	$opt.=' '."-fsyntax-only";
+	$opt.=' -fsyntax-only';
     }
 
 }
@@ -579,6 +592,13 @@ sub run{
 	$exe=~s/\//\\/g;
 	print 'vcexpress','/debugexe',$exe,@ARGV;
 	exec 'vcexpress','/debugexe',"${exe}.exe",@ARGV;
+    }elsif($prof eq "gprof"){
+	system $exe,@ARGV;
+	my $out=`gprof $exe`;
+	local* OUT; 
+	open OUT,">gprof.txt";
+	print OUT $out;
+	close OUT;
     }else{
 	exec $exe,@ARGV;
     }
@@ -631,8 +651,7 @@ if($show_depend){
     exit 0;
 }
 
-
-if($syntax || (!$no_cache && compilep($exe,$main_src,$other_src,$inc))){
+if($syntax || $no_cache || compilep($exe,$main_src,$other_src,$inc)){
     gen_src($main_src,$mod_main_src);
     compile();
 }
@@ -643,5 +662,4 @@ if($syntax||$output_binary){
     
 
 run();
-
 
