@@ -55,16 +55,16 @@ struct SVM{
     YY=Y*t(Y);
   }
   double cost(){
+    LL=L*t(L);
     return sum(L)-0.5*sum(x(x(XX,YY),LL));
   }
   void update(double d,double C){
-    LL=L*t(L);
     L+=(ones-x(XX,YY)*L-YY*L*C)*d;
     mat_for(L){
       if(L(r,c)<0)
-	L(r,c)=0;
+        L(r,c)=0;
     }
-    w=t(X)*x(L,Y);
+    w=t(t(x(L,Y))*X);
     b=sum(x(X*w,L))/sum(L);
   }
 };

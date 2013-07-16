@@ -1,4 +1,7 @@
 #!/usr/bin/env c-script
+// #pragma c-script:eval_begin
+// $default_header="#define DEBUG_MATRIX\n".$default_header;
+// #pragma c-script:eval_end
 
 double
 sigm(double v){
@@ -106,18 +109,20 @@ struct BP{
     //E/Wnij=sumj(E/Sn1j*Wn1ji)*hd(Sni)*X3j
     //E/Sn1i =(Xn1i-Dn1i)*hd(Sn1i);
     //E/Sni =sumj(E/Sn1j*Wn1ji)*hd(Sni);
-    
+    // printf("start\n");
     for(int n=N-1;n>=0;n--){
       if(n==N-1)
-	ES[n]=x(X[n+1]-D,hd(S[n]));
+        ES[n]=x(X[n+1]-D,hd(S[n]));
       else
-	ES[n]=x(t(W[n+1])*ES[n+1],hd(S[n]));
+        ES[n]=x(t(t(ES[n+1])*W[n+1]),hd(S[n]));
       //      EW[n]=ES[n]*t(X[n]);
     }
     for(int n=N-1;n>=0;n--){
       //      W[n]+=EW[n]*d;
       W[n]+=ES[n]*t(X[n])*d;
     }
+    // printf("end\n");
+    //    exit(0);
   }
   void
   update(const Matrix<double>& IN,
