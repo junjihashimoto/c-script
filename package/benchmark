@@ -1,0 +1,3 @@
+#pragma c-script:opt  -I$script_home/libs/benchmark
+#pragma c-script:src  $script_home/libs/benchmark/benchmark.cpp
+#include <benchmark.h>

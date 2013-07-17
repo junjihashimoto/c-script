@@ -1,37 +1,8 @@
 #!/usr/bin/env c-script
 
-#include <sys/time.h>
-#include <sys/resource.h>
+#pragma c-script:use benchmark
 
 #include <algorithm>
-
-struct Benchmark{
-  double pre_time;
-  double delta;
-  int    num;
-  double get_time(){
-    struct timeval t;
-    struct timezone tzp;
-    gettimeofday(&t, &tzp);
-    return t.tv_sec + t.tv_usec*1e-6;
-  }
-  void reset(){
-    delta=0;
-    num=0;
-    pre_time=get_time();
-  }
-  void begin(){
-    pre_time=get_time();
-  }
-  void end(){
-    delta+=get_time()-pre_time;
-    num++;
-  }
-  void print(){
-    printf("%e\n",delta/(double)num);
-  }
-} benchmark;
-
 
 
 int 
