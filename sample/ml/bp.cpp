@@ -2,39 +2,48 @@
 // #pragma c-script:eval_begin
 // $default_header="#define DEBUG_MATRIX\n".$default_header;
 // #pragma c-script:eval_end
-
-double
-sigm(double v){
+template<class T>
+T
+sigm(T v){
   return 1.0/(1.0+exp(-v));
 }
 
-double
-sigmd(double v){
+template<>
+float
+sigm(float v){
+  return 1.0f/(1.0f+expf(-v));
+}
+
+template<class T>
+T
+sigmd(T v){
   return sigm(v)*(1.0-sigm(v));
 }
 
-
-Matrix<double>
-h(Matrix<double> X){
-  Matrix<double> a=MAP(X,sigm);
+template<class T>
+Matrix<T>
+h(Matrix<T> X){
+  Matrix<T> a=MAP(X,sigm<T>);
   return a;
 }
 
-Matrix<double>
-hd(Matrix<double> X){
-  Matrix<double> a=MAP(X,sigmd);
+template<class T>
+Matrix<T>
+hd(Matrix<T> X){
+  Matrix<T> a=MAP(X,sigmd<T>);
   return a;
 }
 
+template<class T>
 struct BP{
   int N;
-  Matrix<double>* X;//[N+1];
-  Matrix<double>* S;//[N];
-  Matrix<double>* ES;//[N];
-  Matrix<double>* W;//[N]; 
-  Matrix<double>* EW;//[N];
+  Matrix<T>* X;//[N+1];
+  Matrix<T>* S;//[N];
+  Matrix<T>* ES;//[N];
+  Matrix<T>* W;//[N]; 
+  Matrix<T>* EW;//[N];
   vector<int>     hier;
-  double d;
+  T d;
   
   BP&
   operator <<(int i){
@@ -65,11 +74,11 @@ struct BP{
   void
   init(){
     N	=hier.size()-1;
-    X	=new Matrix<double>[N+1];
-    S	=new Matrix<double>[N];
-    ES	=new Matrix<double>[N];
-    W	=new Matrix<double>[N];
-    EW	=new Matrix<double>[N];
+    X	=new Matrix<T>[N+1];
+    S	=new Matrix<T>[N];
+    ES	=new Matrix<T>[N];
+    W	=new Matrix<T>[N];
+    EW	=new Matrix<T>[N];
     
     X[N].init(hier[N],1);
     
@@ -93,8 +102,8 @@ struct BP{
   //E/S1i =(X1i-D1i)*h(S1i)(1-h(S1i));
   //E/S2i =sumj(E/S1j*w1ji)*h(S2i)*(1-h(S2i));
   
-  const Matrix<double>&
-  forward(const Matrix<double>& Y){
+  const Matrix<T>&
+  forward(const Matrix<T>& Y){
     X[0]=Y;
     for(int i=0;i<N;i++){
       S[i]=W[i]*X[i];
@@ -103,7 +112,7 @@ struct BP{
     return X[N];
   }
   void
-  backward(const Matrix<double>& D){
+  backward(const Matrix<T>& D){
     //E=sumi(Xn1i-Di)^2
     //E/Wn1ij=(Xn1i-Di)*hd(Sn1i)*Xnj
     //E/Wnij=sumj(E/Sn1j*Wn1ji)*hd(Sni)*X3j
@@ -125,8 +134,8 @@ struct BP{
     //    exit(0);
   }
   void
-  update(const Matrix<double>& IN,
-	 const Matrix<double>& EXP
+  update(const Matrix<T>& IN,
+	 const Matrix<T>& EXP
 	 ){
     forward(IN);
     backward(EXP);
@@ -134,9 +143,10 @@ struct BP{
 };
 
 
+template<class T>
 int
-main(){
-  BP bp;
+test(){
+  BP<T> bp;
   bp<<
     2,//input
     256*256,//inernal
@@ -147,16 +157,22 @@ main(){
   bp.init();
   for(int i=0;i<bp.hier.size();i++)
     printf("%d\n",bp.hier[i]);
-  for(int i=0;i<10000;i++){
-    Matrix<double> in(2);
-    Matrix<double> out(1);
-    in[0]=(double)(rand()%2);
-    in[1]=(double)(rand()%2);
-    out[0]=(double)((int)in[0]^(int)in[1]);
+  for(int i=0;i<10;i++){
+    Matrix<T> in(2);
+    Matrix<T> out(1);
+    in[0]=(T)(rand()%2);
+    in[1]=(T)(rand()%2);
+    out[0]=(T)((int)in[0]^(int)in[1]);
     bp.update(in,out);
     printf("%d\n",i);
   }
 
   
+  return 0;
+}
+int
+main(){
+  test<float>();
+  test<double>();
   return 0;
 }
