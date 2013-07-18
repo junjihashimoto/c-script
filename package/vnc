@@ -1,3 +1,4 @@
+#pragma c-script:use bmp
 #pragma c-script:use thread
 
 #include <vnclib.h>
