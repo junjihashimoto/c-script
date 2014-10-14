@@ -211,6 +211,11 @@ sub setup{
     }
 
     $script_home=realpath(dirname  $0);
+
+    if( ! -d "$script_home/init"){
+	$script_home=dirname($script_home)."/lib/c-script"
+    }
+
     $script_name=basename $0;
 
 

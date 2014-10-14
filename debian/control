@@ -1,0 +1,13 @@
+Source: c-script
+Section: devel
+Priority: optional
+Maintainer: Junji Hashimoto <junji.hashimoto@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: https://github.com/junjihashimoto/c-script
+Vcs-Git: git@github.com:junjihashimoto/c-script.git
+
+Package: c-script
+Architecture: any
+Depends: perl, g++, gfortran, libblas-dev, liblapack-dev, libpng12-dev, libjpeg-dev, ${shlibs:Depends}, ${misc:Depends}
+Description: script programing environment for c++
