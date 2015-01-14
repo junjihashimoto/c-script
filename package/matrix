@@ -4,6 +4,7 @@
 #include <matrix/mat_util.h>
 
 #pragma c-script:opt  -I$script_home/include/matrix
+#pragma c-script:src  $script_home/include/matrix/mat_default.cpp
 #pragma c-script:src  $script_home/include/matrix/mat_double.cpp
 #pragma c-script:src  $script_home/include/matrix/mat_float.cpp
 

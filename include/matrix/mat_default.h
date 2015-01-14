@@ -2,9 +2,10 @@
 
 //#define DEBUG_MATRIX
 #ifdef DEBUG_MATRIX
-#define MALLOC(a)     malloc(a);printf("malloc:%d\n",(int)(a))
+extern int debug_count;
+#define MALLOC(a)     malloc(a);printf("malloc:%d:%d\n",debug_count++,(int)(a))
 #define MEMCPY(a,b,c) memcpy(a,b,c);printf("memcpy:%d\n",(int)(c))
-#define FREE(a)       free(a);printf("free\n")
+#define FREE(a)       free(a);if(a!=NULL){printf("free:%d\n",--debug_count);}
 #else
 #define MALLOC(a)     malloc(a)
 #define MEMCPY(a,b,c) memcpy(a,b,c)

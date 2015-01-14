@@ -10,3 +10,8 @@ install:
 	cp -r libs $(DESTDIR)$(prefix)/lib/c-script/libs
 	cp -r package $(DESTDIR)$(prefix)/lib/c-script/package
 	cp -r sample $(DESTDIR)$(prefix)/share/c-script/sample
+
+test:
+	cabal sandbox init
+	cabal install --only-dep --enable-tests
+	cabal test

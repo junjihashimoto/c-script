@@ -28,7 +28,7 @@ our $mod_main_src;
 our $normal_opt;
 our $opt;
 our $other_src;
-our $no_chk_main;
+our $no_chk_main=0;
 our $no_cache;
 
 our $syntax;
@@ -410,7 +410,7 @@ sub gen_src_str{
 sub gen_src{
     my ($main_src,$mod_main_src)=@_;
     my $code="";
-    my $nomain=1;
+    my $insert_main=0;
 
     my ($suffix)=($script_name =~ /\.([^.]*$)/);
     local* IN_MAIN;
@@ -418,27 +418,27 @@ sub gen_src{
     local* OUT;
 
     if(!$no_chk_main){
+	$insert_main=1;
 	open IN_MAIN,"<$main_src";
 	while(<IN_MAIN>){
 	    if(/main|Main/){
-		$nomain=0;
+		$insert_main=0;
 		last;
 	    }
 	}
 	close IN_MAIN;
     }
     
-
     
     $code.=$source_filter->(gen_src_str($default_header,0));
     
-    $code.="int main(int argc,char** argv){\n" if($nomain);
+    $code.="int main(int argc,char** argv){\n" if($insert_main);
     
     $code.="#line 1  \"$main_src\"\n";
     
     $code.=$source_filter->(gen_src_str(file2str($main_src),1));
     
-    $code.="  return 0;\n}\n" if($nomain);
+    $code.="  return 0;\n}\n" if($insert_main);
     open OUT,">$mod_main_src";
     print OUT $code;
     close OUT;
