@@ -1,6 +1,8 @@
 c-script
 ========
 
+[![Build Status](https://travis-ci.org/junjihashimoto/c-script.svg?branch=master)](https://travis-ci.org/junjihashimoto/c-script)
+
 c-script provides the function of script language for c++.
 
 This is made for throwaway, short, and fast programs.  

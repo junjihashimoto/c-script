@@ -28,4 +28,3 @@ main = hspec $ do
       ("./c-script",["./sample/misc/source_filter_test.cpp"],[]) @==
         [str|3
             |]
-  describe "basic-test" $ do

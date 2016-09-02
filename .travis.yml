@@ -1,13 +1,12 @@
-language: haskell
+language: cpp
 
-ghc:
-  - 7.8
-
+sudo: required
+dist: trusty
 install:
   - sudo apt-get update
-  - sudo apt-get install libjpeg8-dev libpng12-dev catch liblapack-dev liblapack3 libblas-dev libblas3
+  - sudo apt-get install libjpeg8-dev libpng12-dev catch liblapack-dev liblapack3 libblas-dev libblas3 ghc cabal-install gfortran
   - cabal update
-  - cabal install -j --only-dep  --enable-tests --force-reinstalls
+  - cabal install -j --only-dep  --enable-tests --force-reinstalls --reorder-goals
 
 script:
   - cabal configure --enable-tests && cabal build && cabal test

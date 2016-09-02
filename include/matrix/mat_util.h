@@ -1,7 +1,5 @@
 #ifndef MATRIX_UTIL_H
 #define MATRIX_UTIL_H
-template<class T> void      read_csv(const char* file,Matrix<T>& dat,const char* format=NULL);
-template<class T> void      write_csv(const char* file,const Matrix<T>& dat,const char* format=NULL);
 
 template<class T> string    default_read_fomat();
 template<class T> string    default_write_fomat();
@@ -45,7 +43,7 @@ default_write_fomat<int>(){
 
 template<class T>
 void
-read_csv(const char* file,Matrix<T>& mat,const char* format){
+read_csv(const char* file,Matrix<T>& mat,const char* format=NULL){
   FILE* in=fopen(file,"rb");
   DATA dat;
   vector<vector<string> > vec;
