@@ -5,7 +5,7 @@ dist: trusty
 install:
   - sudo apt-get update
   - sudo apt-get install libjpeg8-dev libpng12-dev catch liblapack-dev liblapack3 libblas-dev libblas3 ghc cabal-install gfortran
-  - sudo apt-get install build-essentials devscripts debhelper
+  - sudo apt-get install build-essential devscripts debhelper
   - cabal update
   - cabal install -j --only-dep  --enable-tests --force-reinstalls --reorder-goals
 
