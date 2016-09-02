@@ -11,5 +11,5 @@ install:
 
 script:
   - cabal configure --enable-tests && cabal build && cabal test
-  - debuild -uc -us
+  - yes | debuild -uc -us
 
